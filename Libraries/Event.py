@@ -28,7 +28,7 @@ skipSignalTypes = []
 
 computerPullSignal = computer.pullSignal
 computerUptime = computer.uptime
-mathHuge = inf
+##mathHuge = inf
 
 def checkArg(argument, types):
     if not isinstance(argument, types):
@@ -42,11 +42,11 @@ def error(name, code=None):
     raise InterruptedError(f'{name} {code}')
 
 class Handler(object):
-    def __init__(self, callback, times, interval):
+    def __init__(self, callback, times=inf, interval=0):
         self.callback = callback
-        self.times = times or mathHuge
+        self.times = times# or mathHuge
         self.interval = interval
-        self.nextTriggerTime = interval and computerUptime() + interval or 0
+        self.nextTriggerTime = computerUptime() + interval
     
     def __repr__(self):
         return f'Handler({self.callback}, {self.times}, {self.interval})'  
@@ -57,7 +57,7 @@ interruptingDelay = 1
 interruptingKeyCodes:[29, 46, 56]
 push = computer.pushSignal
 
-def addHandler(callback, interval, times):
+def addHandler(callback, interval=0, times=inf):
     """Registers an event handler wrapper for given function and returns it.
 
 Every registered handler will be analyzed for the need to run during each pull() call. When handler is being run, it receives values returned from pull() as arguments.
@@ -66,8 +66,8 @@ You can specify an interval in seconds between each run of given handler. By def
 
 You can also specify number of times that given handler will be run before being removed automatically. By default it's set to infinity."""
     checkArg(callback, FUNCTION)
-    checkArg(interval, (int, None))
-    checkArg(times, (int, None))
+    checkArg(interval, int)
+    checkArg(times, (int, type(inf)))
     
     handler = Handler(callback, times, interval)
     

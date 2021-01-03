@@ -16,3 +16,6 @@ Sides API is completely implemented.
 Filesystem API is implemented, but loadfile is probably broken and numerouse issues have been observed with the handler class, some coming from component.Proxy.
 Filesystem API write is known to function properly, reading may be broken.
 Image API is partially implemented, but I am having diffuculties getting encoding method six to load files, and saveing images is being weird.
+
+
+Anything not listed above is not implemented.

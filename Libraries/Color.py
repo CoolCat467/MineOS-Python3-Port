@@ -2,7 +2,7 @@
 # This library is made for color manipulations. It allows you to extrude and pack color channels, convert the RGB color model to HSB and vice versa, perform alpha blending, generate color transitions and convert the color to 8-bit format for the OpenComputers palette.
 # -*- coding: utf-8 -*-
 
-from math import floor as mathFloor, inf as mathHuge, modf
+from math import floor, inf, modf
 from functools import wraps
 
 __all__ = ['RGBToInteger', 'integerToRGB', 'RGBToHSB',
@@ -20,7 +20,7 @@ def _cacheResults(function):
     cache = {}
     @wraps(function)
     def withCache(*args, **kwargs):
-        if not DOCACHE:
+        if DOCACHE:
             argstr = argsToStr(args)+'/'+kwargsToStr(kwargs)
             if not argstr in cache:
                 cache[argstr] = function(*args, **kwargs)
@@ -90,7 +90,7 @@ def integerToRGB(integerColor):
     return integerColor >> 16, integerColor >> 8 & 0xff, integerColor & 0xff
 
 def blend(color1, color2, transparency):
-    """Mixes two colors considering the transparency of the second color."""
+    """Mixes two 24 bit colors considering the transparency of the second color."""
     invertedTransparency = 1 - transparency
     r = int(((color2 >> 16) * invertedTransparency + (color1 >> 16) * transparency) // 1) << 16
     g = int(((color2 >> 8 & 0xff) * invertedTransparency + (color1 >> 8 & 0xff) * transparency) // 1) << 8
@@ -110,12 +110,13 @@ def transition(color1, color2, position):
 def to8Bit(color24Bit):
     """Looks to 256-color OpenComputers palette and returns the color index that most accurately matches given value using the same search method as in gpu.setBackground(value) do."""
     r, g, b = color24Bit >> 16, color24Bit >> 8 & 0xff, color24Bit & 0xff
-    closestDelta, closestIndex = mathHuge, 1
+    print((r, g, b))
+    closestDelta, closestIndex = inf, 1
     # Moved outside of loop from original
     # See if 24 bit color perfectly matches a palette color
     if color24Bit in palette[1:]:
         # If there is an entry of 24 bit color in palette, return index minus 1 because we skip first entry.
-        print(palette.index(color24Bit))
+##        print(palette.index(color24Bit))
         return palette.index(color24Bit) - 1
     # We ignore first one, so we need to shift palette indexing by one
     for i in range(1, len(palette)-1):
@@ -158,16 +159,16 @@ def HSBToRGB(h, s, b):
     p, q, t = b * (1 - s), b * (1 - s * fractional), b * (1 - (1 - fractional) * s)
     
     if integer == 0:
-        return mathFloor(b * 255), mathFloor(t * 255), mathFloor(p * 255)
+        return floor(b * 255), floor(t * 255), floor(p * 255)
     elif integer == 1:
-        return mathFloor(q * 255), mathFloor(b * 255), mathFloor(p * 255)
+        return floor(q * 255), floor(b * 255), floor(p * 255)
     elif integer == 2:
-        return mathFloor(p * 255), mathFloor(b * 255), mathFloor(t * 255)
+        return floor(p * 255), floor(b * 255), floor(t * 255)
     elif integer == 3:
-        return mathFloor(p * 255), mathFloor(q * 255), mathFloor(b * 255)
+        return floor(p * 255), floor(q * 255), floor(b * 255)
     elif integer == 4:
-        return mathFloor(t * 255), mathFloor(p * 255), mathFloor(b * 255)
-    return mathFloor(b * 255), mathFloor(p * 255), mathFloor(q * 255)
+        return floor(t * 255), floor(p * 255), floor(b * 255)
+    return floor(b * 255), floor(p * 255), floor(q * 255)
 
 def integerToHSB(integerColor):
     """Convert an integer to an RGB value and then that into a HSB value."""

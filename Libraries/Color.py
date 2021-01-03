@@ -3,11 +3,30 @@
 # -*- coding: utf-8 -*-
 
 from math import floor as mathFloor, inf as mathHuge, modf
+from functools import wraps
 
 __all__ = ['RGBToInteger', 'integerToRGB', 'RGBToHSB',
            'HSBToRGB', 'integerToHSB', 'HSBToInteger',
            'blend', 'transition', 'to8Bit', 'to24Bit',
            'optimize']
+DOCACHE = True
+
+def _cacheResults(function):
+    """Decorator to cache results for functions that when given arguments return constant results."""
+    def argsToStr(x):
+        return '-'.join((str(i) for i in x))
+    def kwargsToStr(x):
+        return ';'.join((str(k)+'='+str(x[k]) for k in x))
+    cache = {}
+    @wraps(function)
+    def withCache(*args, **kwargs):
+        if not DOCACHE:
+            argstr = argsToStr(args)+'/'+kwargsToStr(kwargs)
+            if not argstr in cache:
+                cache[argstr] = function(*args, **kwargs)
+            return cache[argstr]
+        return function(*args, **kwargs)
+    return withCache
 
 ##mathHuge = 2**1024 - 1
 def mathModf(x):
@@ -87,14 +106,16 @@ def transition(color1, color2, position):
     b = int(b1 + ((b2 - b1) * position) // 1)
     return r | g | b
 
+@_cacheResults
 def to8Bit(color24Bit):
     """Looks to 256-color OpenComputers palette and returns the color index that most accurately matches given value using the same search method as in gpu.setBackground(value) do."""
     r, g, b = color24Bit >> 16, color24Bit >> 8 & 0xff, color24Bit & 0xff
     closestDelta, closestIndex = mathHuge, 1
     # Moved outside of loop from original
     # See if 24 bit color perfectly matches a palette color
-    if color24Bit in palette:
+    if color24Bit in palette[1:]:
         # If there is an entry of 24 bit color in palette, return index minus 1 because we skip first entry.
+        print(palette.index(color24Bit))
         return palette.index(color24Bit) - 1
     # We ignore first one, so we need to shift palette indexing by one
     for i in range(1, len(palette)-1):

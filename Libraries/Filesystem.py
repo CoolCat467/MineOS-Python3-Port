@@ -29,16 +29,21 @@ SORTING_DATE = 3
 class string:
     def char(bytes_):
         """Decode bytes and return string."""
+        if len(bytes_) == 1:
+            return ord(bytes_)
         if isinstance(bytes_, bytes):
             return bytes_.decode('utf-8')
         elif isinstance(bytes_, str):
             return bytes_
+        print(bytes_)
         raise ValueError
     
     def byte(string_):
         """Encode string and return bytes."""
         if isinstance(string_, str):
             return string_.encode('utf-8')
+        elif isinstance(string_, int):
+            return chr(string_)
         elif isinstance(string_, bytes):
             return string_
         raise ValueError
@@ -123,6 +128,7 @@ def unmount(proxy):
 def get(path_):
     """Determines correct filesystem component proxy from given path and returns it with rest path part."""
     if not isinstance(path_, str):
+        print(path_)
         error('Invalid argument.')
     for mp in mountedProxies:
         if path_[:len(mp.path)] == mp.path:
@@ -270,11 +276,6 @@ The default value for whence is "cur", and for offset is 0. If seek was successf
     
     def readString(self, count):
         """Reads string with length of given count of bytes. Returns string value or None if EOF has reached."""
-##        def fixType(x):
-####            if not 'b' in self.mode:
-##            if isinstance(x, bytes):
-##                return string.char(x)
-##            return x
         # If current buffer content is a "part" of "count data" we need to read
         if count > len(self.buffer):
             data = self.buffer
@@ -291,10 +292,11 @@ The default value for whence is "cur", and for offset is 0. If seek was successf
                     
                     # EOF at start
                     if len(data) == 0:
+                        print('EOF')
                         return None
 ##                    else:# EOF after read
                     return data
-##                        return fixType(data)
+##                    return fixType(data)
             
             self.buffer = data[count:]#-1
             chunk = data[:count]
@@ -312,10 +314,6 @@ The default value for whence is "cur", and for offset is 0. If seek was successf
     
     def readLine(self):
         """Reads next line from file without \n character. Returns string line or None if EOF has reached."""
-        def fixType(x):
-            if isinstance(x, bytes):
-                return string.char(x)
-            return x
         data = _getForMode('', self.mode)
         
         linebreak = _getForMode('\n', self.mode)
@@ -328,7 +326,7 @@ The default value for whence is "cur", and for offset is 0. If seek was successf
                     self.position += len(chunck)
                     
 ##                    return data + chunck
-                    return fixType(data + chunck)
+                    return string.char(data + chunck)
                 else:
                     data += self.buffer
             
@@ -343,7 +341,7 @@ The default value for whence is "cur", and for offset is 0. If seek was successf
                 self.position = self.seek('end', 0)
                 
 ##                return len(data) > 0 and data or None
-                return len(data) > 0 and fixType(data) or None
+                return len(data) > 0 and string.char(data) or None
     
     def lines(self):
         """Return a generator object that will return lines, and on EOF close self."""
@@ -361,10 +359,6 @@ The default value for whence is "cur", and for offset is 0. If seek was successf
     
     def readAll(self):
         """Reads whole file as string. Returns string data if reading operation was successful, None and reason message otherwise."""
-##        def fixType(x):
-##            if isinstance(x, bytes):
-##                return string.char(x)
-##            return x
         data = _getForMode('', self.mode)
         while True:
             chunk, error_ = self.proxy.read(self.stream, BUFFER_SIZE)
@@ -378,34 +372,26 @@ The default value for whence is "cur", and for offset is 0. If seek was successf
                 break
 ##        return data
         return string.char(data)
-##            return fixType(data)
     
     def readBytes(self, count, littleEndian=False):
         """Reads number represented by count of bytes in big endian format by default or little endian if desired. Returns int value or None if EOF has reached."""
-##        def fixType(x):
-##            if isinstance(x, bytes):
-##                return string.char(x)
-##            return x
         if count == 1:
             data = self.readString(1)
             if data:
                 return ord(data)
             return None
-##        else:
-##        bytes_, result = self.readString(count) or '\x00', 0
-##        bytes_ = self.readString(count) or b'\x00'
-        bytes_ = string.byte(self.readString(count)) or b'\x00'
-        #_getForMode('', self.mode)
-        result = 0
-##        print(['bytes', bytes_])
-        
-        if littleEndian:
-            for i in range(len(bytes_)-1, -1, -1):
-                result = bit32.bor(bit32.lshift(result, 8), bytes_[i])
         else:
-            for i in range(len(bytes_)):
-                result = bit32.bor(bit32.lshift(result, 8), bytes_[i])
-        return result
+            lst = lambda x: [i for i in x]
+            bytes_ = lst(string.byte(self.readString(count))[:8]) or b'\x00'
+            result = 0
+            
+            if littleEndian:
+                for i in range(len(bytes_)-1, -1, -1):
+                    result = bit32.bor(bit32.lshift(result, 8), bytes_[i])
+            else:
+                for i in range(len(bytes_)):
+                    result = bit32.bor(bit32.lshift(result, 8), bytes_[i])
+            return result
     
     def readUnicodeChar(self):
         """Reads next bytes (up to 6 from current position) as char in UTF-8 encoding. Returns string value or nil if EOF has reached."""        
@@ -436,7 +422,7 @@ The default value for whence is "cur", and for offset is 0. If seek was successf
             if format_ == 'a':
                 return self.readAll()
             elif format_ == 'l':
-                return self.readLines()
+                return self.readLine()
             elif format_ == 'b':
                 return self.readBytes(1)
             elif format_ == 'bs':
@@ -464,6 +450,7 @@ The default value for whence is "cur", and for offset is 0. If seek was successf
             # If data will not fit in buffer, use iterative writeing with data partitioning
             if len(data) > BUFFER_SIZE:
                 for i in range(0, math.ceil(len(data) / BUFFER_SIZE), BUFFER_SIZE):
+##                    print(data[i:i+BUFFER_SIZE])
                     success, reason = self.proxy.write(self.stream, data[i:i+BUFFER_SIZE])
                     
                     if not success:
@@ -483,6 +470,8 @@ The default value for whence is "cur", and for offset is 0. If seek was successf
     
     def writeBytes(self, *args):
         """Writes passed numbers in [0; 255] range as bytes to file. Returns True, None on success, False and reason message otherwise."""
+##        if len(args) > 1:
+##            print([string.byte(i) for i in args])
         return self.write(*[string.byte(i) for i in args])#b''.join(bytearray(args)).decode('utf-8'))
     
     def __bool__(self):

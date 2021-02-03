@@ -19,8 +19,6 @@ __all__ = ['blend', 'copy', 'create', 'crop',
            'load', 'save', 'set', 'toString',
            'transform']
 
-from collections import Counter
-
 OCIFSignature = 'OCIF'
 encodingMethodsLoad = {}
 encodingMethodsSave = {}
@@ -125,7 +123,7 @@ def group(picture, compressColors=False):
         groupedPicture[alpha][char][background][foreground][y].append(x)
         
         x += 1
-        if x > p[0]:
+        if x > picture[0]:
             x = 1
             y += 1
     return groupedPicture
@@ -153,10 +151,6 @@ def encMethodLoad5(file, picture):
         picture[i+1] = color.to24Bit(file.readBytes(1))
         picture[i+2] = file.readBytes(1) / 255
         picture[i+3] = file.readUnicodeChar()
-##        picture.append(color.to24Bit(file.readBytes(1)))
-##        picture.append(color.to24Bit(file.readBytes(1)))
-##        picture.append(file.readBytes(1) / 255)
-##        picture.append(file.readUnicodeChar())
     return None, None
 
 encodingMethodsLoad[5] = encMethodLoad5
@@ -243,9 +237,8 @@ def encMethodLoad6(file, picture):
                             if index < 2:
                                 print(currentX, currentY)
                                 continue
-##                            index = getIndex(currentX, currentY, picture[0])
-##                            picture[index], picture[index+1], picture[index+2], picture[index+3] = currentBackground, currentForeground, currentAlpha, currentSymbol
-                            set_(picture, currentX, currentY, currentBackground, currentForeground, currentAlpha, currentSymbol)
+                            picture[index], picture[index+1], picture[index+2], picture[index+3] = currentBackground, currentForeground, currentAlpha, currentSymbol
+##                            set_(picture, currentX, currentY, currentBackground, currentForeground, currentAlpha, currentSymbol)
     return None, None
 
 encodingMethodsLoad[6] = encMethodLoad6

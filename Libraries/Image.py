@@ -70,12 +70,13 @@ class Picture:
             for x in range(1, w+1):
                 try:
                     data = get(self.data, x, y)[3]
-                    if not isinstance(data, str):
-                        raise ValueError
+##                    if not isinstance(data, str):
+##                        raise ValueError
                     chars.append(data)
 ##                    chars.append(self.data[(4 * ((y * w) + x) + 2) + 3])
                 except BaseException:
-                    chars.append('�')
+##                    chars.append('�')
+                    chars.append(' ')
 ##        chars = [self.data[2+i*4+3] for i in range(pixels)]
         #(len(self.data)-2) // w-4
         lines = [''.join(chars[i*w:(i+1)*w]) for i in range(realh)]
@@ -200,42 +201,46 @@ def encMethodSave6(file, picture):
 
 encodingMethodsSave[6] = encMethodSave6
 
-def encMethodLoad6(file, picture):
+def encMethodLoad6(file, picture, mode=0):
     """Very efficiant."""
     picture[0] = file.readBytes(1)
     picture[1] = file.readBytes(1)
     
-    alphaSize = file.readBytes(1)
+    alphaSize = file.readBytes(1) + mode
     
     for alpha in range(alphaSize):
         currentAlpha = file.readBytes(1) / 255
-        symbolSize = file.readBytes(2)
+        symbolSize = file.readBytes(2) + mode
         
         for symbol in range(symbolSize):
+            print(symbolSize)
             currentSymbol = file.readUnicodeChar()
+            print(currentSymbol)
             backgroundSize = file.readBytes(1)
             
-            for background in range(backgroundSize):
+            for background in range(backgroundSize + mode):
                 currentBackground = color.to24Bit(file.readBytes(1))
                 foregroundSize = file.readBytes(1)
                 
-                for foreground in range(foregroundSize):
+                for foreground in range(foregroundSize + mode):
                     currentForeground = color.to24Bit(file.readBytes(1))
                     ySize = file.readBytes(1)
                     
-                    for y in range(ySize):
+                    for y in range(ySize + mode):
                         currentY = file.readBytes(1)
                         xSize = file.readBytes(1)
                         
-                        for x in range(xSize):
+                        for x in range(xSize + mode):
                             currentX = file.readBytes(1)
+                            
                             if currentX is None:
                                 print(currentX, currentY, '%06x' % currentBackground, '%06x' % currentForeground, currentAlpha, currentSymbol)
                                 print(f'{x}/{xSize} {y}/{ySize} {background}/{backgroundSize} {foreground}/{foregroundSize} {alpha}/{alphaSize} {symbol}/{symbolSize}')
                                 return None, None
                             index = getIndex(currentX, currentY, picture[0])
                             if index < 2:
-                                print(currentX, currentY)
+##                                print('Low index!')
+##                                print(currentX, currentY)
                                 continue
                             picture[index], picture[index+1], picture[index+2], picture[index+3] = currentBackground, currentForeground, currentAlpha, currentSymbol
 ##                            set_(picture, currentX, currentY, currentBackground, currentForeground, currentAlpha, currentSymbol)
@@ -247,20 +252,21 @@ def getSize(picture):
     """Return the size of a given picture."""
     return picture[0], picture[1]
 
-def getWidth(picture):
+def getWidth(picture) -> int:
     """Return the width of a given picture."""
     return picture[0]
 
-def getHeight(picture):
+def getHeight(picture) -> int:
     """Return the height of a given picture."""
     return picture[1]
 
-def getIndex(x:int, y:int, width:int):
+def getIndex(x:int, y:int, width:int) -> int:
     """Return the internal picture index of a given pixel, given xy position and the width of the image. Indexing starts at 1, 1."""
     #Original
     #return 4 * (width * (y - 1) + x) - 1
     # Fixed python indexing
     return 4 * (width * (y - 1) + x) - 2
+##    return 4 * (width * (y - 1) + x) - 1
 
 def set_(picture, x, y, background, foreground, alpha, symbol):
     """Set the data of the pixel at given xy choordinates in a given image."""
@@ -323,7 +329,7 @@ def load(path):
     """Load an image from given path. Automatically de-compresses."""
     file, reason = filesystem.open(path, 'rb')
     if file:
-##        print(f'Length: {file.proxy.size(path)[0]}')
+        print(f'Length: {file.proxy.size(path)[0]}')
         readSignature = string.char(file.readString(len(OCIFSignature)))
         if readSignature == OCIFSignature:
             encodingMethod = file.readBytes(1)
@@ -331,7 +337,7 @@ def load(path):
                 picture = {}
                 result, reason = encodingMethodsLoad[encodingMethod](file, picture)
                 
-##                print(f'End position: {file.position}')
+                print(f'End position: {file.position}')
                 
                 file.close()
                 

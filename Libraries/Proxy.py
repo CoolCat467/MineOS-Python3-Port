@@ -5,7 +5,7 @@
 # Programmed by CoolCat467
 
 __all__ = ['WARNING', 'LIBRARIES', 'MINEOS',
-           'OPENCOMPUTERS', 'Proxy']
+           'OPENCOMPUTERS', 'COMPONENTS', 'Proxy']
 
 WARNING = True
 
@@ -16,6 +16,8 @@ from io import IOBase as _IOBASE
 LIBRARIES = _os.path.split(__file__)[0]
 MINEOS = _os.path.split(LIBRARIES)[0]
 OPENCOMPUTERS = _os.path.split(MINEOS)[0]
+
+COMPONENTS = {}
 
 def _isStream(stream):
     """Return wether stream argument is an instance of io.IOBase."""

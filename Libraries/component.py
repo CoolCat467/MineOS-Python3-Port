@@ -16,7 +16,6 @@ import Proxy as _Proxy
 ##OPENCOMPUTERS = os.path.split(MINEOS)[0]
 
 BOOT_PROXY = None
-COMPONENTS = {}
 PRIMARYS = {}
 
 import computer
@@ -24,13 +23,13 @@ import computer
 def get(abbreviatedAddress):
     """Returns full address from an abbreviated address."""
     leng = len(abbreviatedAddress)
-    for addr in COMPONENTS:
+    for addr in _Proxy.COMPONENTS:
         if addr[:leng] == abbreviatedAddress:
             return addr
 
 def isAvailable(componentName):
     """Return True if component of name componentName is available."""
-    componentTypes = list(COMPONENTS.keys())
+    componentTypes = list(_Proxy.COMPONENTS.keys())
     return componentName in componentTypes
 
 def getPrimary(componentName):
@@ -40,10 +39,10 @@ def getPrimary(componentName):
     raise RuntimeError(f'No primary component of type "{componentName}"')
 
 def list(type_):
-    return COMPONENTS.copy()
+    return _Proxy.COMPONENTS.copy()
 
 def proxy(address):
-    if address in COMPONENTS:
+    if address in _Proxy.COMPONENTS:
         return _Proxy.Proxy(address)
     raise ValueError('Address is invalid.')
 
@@ -60,8 +59,7 @@ def newRandomAddress():
 
 def addComponent(name, address):
     """Add a component to the dictionary."""
-    global COMPONENTS
-    COMPONENTS[address] = name
+    _Proxy.COMPONENTS[address] = name
 
-addComponent('computer', MINEOS)
-BOOT_PROXY = proxy(MINEOS)
+addComponent('computer', _Proxy.MINEOS)
+BOOT_PROXY = proxy(_Proxy.MINEOS)

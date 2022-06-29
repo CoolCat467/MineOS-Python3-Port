@@ -291,26 +291,23 @@ The default value for whence is "cur", and for offset is 0. If seek was successf
                     self.position = self.seek('end', 0)
                     
                     # EOF at start
-                    if len(data) == 0:
+##                    if len(data) == 0:
+                    if data == '':
                         print('EOF')
                         return None
-##                    else:# EOF after read
+                    # EOF after read
                     return data
-##                    return fixType(data)
             
             self.buffer = data[count:]#-1
             chunk = data[:count]
             self.position += len(chunk)
             
             return chunk
-##            return fixType(chunk)
-##        else:
         data = self.buffer[:count]
         self.buffer = self.buffer[count:]
         self.position += count
         
         return data
-##        return fixType(data)
     
     def readLine(self):
         """Reads next line from file without \n character. Returns string line or None if EOF has reached."""

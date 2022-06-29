@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 
 from math import floor, inf, modf
-from functools import wraps
+from functools import cache, lru_cache
 
 __all__ = ['RGBToInteger', 'integerToRGB', 'RGBToHSB',
            'HSBToRGB', 'integerToHSB', 'HSBToInteger',
@@ -11,22 +11,22 @@ __all__ = ['RGBToInteger', 'integerToRGB', 'RGBToHSB',
            'optimize']
 DOCACHE = True
 
-def _cacheResults(function):
-    """Decorator to cache results for functions that when given arguments return constant results."""
-    def argsToStr(x):
-        return '-'.join((str(i) for i in x))
-    def kwargsToStr(x):
-        return ';'.join((str(k)+'='+str(x[k]) for k in x))
-    cache = {}
-    @wraps(function)
-    def withCache(*args, **kwargs):
-        if DOCACHE:
-            argstr = argsToStr(args)+'/'+kwargsToStr(kwargs)
-            if not argstr in cache:
-                cache[argstr] = function(*args, **kwargs)
-            return cache[argstr]
-        return function(*args, **kwargs)
-    return withCache
+##def _cacheResults(function):
+##    """Decorator to cache results for functions that when given arguments return constant results."""
+##    def argsToStr(x):
+##        return '-'.join((str(i) for i in x))
+##    def kwargsToStr(x):
+##        return ';'.join((str(k)+'='+str(x[k]) for k in x))
+##    cache = {}
+##    @wraps(function)
+##    def withCache(*args, **kwargs):
+##        if DOCACHE:
+##            argstr = argsToStr(args)+'/'+kwargsToStr(kwargs)
+##            if not argstr in cache:
+##                cache[argstr] = function(*args, **kwargs)
+##            return cache[argstr]
+##        return function(*args, **kwargs)
+##    return withCache
 
 ##mathHuge = 2**1024 - 1
 def mathModf(x):
@@ -106,7 +106,7 @@ def transition(color1, color2, position):
     b = int(b1 + ((b2 - b1) * position) // 1)
     return r | g | b
 
-@_cacheResults
+@cache
 def to8Bit(color24Bit):
     """Looks to 256-color OpenComputers palette and returns the color index that most accurately matches given value using the same search method as in gpu.setBackground(value) do."""
     r, g, b = color24Bit >> 16, color24Bit >> 8 & 0xff, color24Bit & 0xff
@@ -176,6 +176,7 @@ def HSBToInteger(h, s, b):
     """Convert an HSB value into an RGB value and that into an integer value."""
     return RGBToInteger(HSBToRGB(h, s, b))
 
+@lru_cache
 def optimize(color24Bit):
     """Get a close approximation from the OC Color Palette of given 24 bit color."""
     return to24Bit(to8Bit(color24Bit))

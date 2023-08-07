@@ -1,40 +1,41 @@
 #!/usr/bin/env python3
-# This library is made for color manipulations. It allows you to extrude and pack color channels, convert the RGB color model to HSB and vice versa, perform alpha blending, generate color transitions and convert the color to 8-bit format for the OpenComputers palette.
+# This library is made for color manipulations.
 # -*- coding: utf-8 -*-
 
-from math import floor, inf, modf
+# It allows you to extrude and pack color channels, convert
+# the RGB color model to HSB and vice versa, perform alpha blending,
+# generate color transitions and convert the color to 8-bit format for
+# the OpenComputers PALETTE.
+
 from functools import cache, lru_cache
+from math import floor, inf, modf
+from typing import SupportsFloat
 
-__all__ = ['RGBToInteger', 'integerToRGB', 'RGBToHSB',
-           'HSBToRGB', 'integerToHSB', 'HSBToInteger',
-           'blend', 'transition', 'to8Bit', 'to24Bit',
-           'optimize']
-DOCACHE = True
+from typing_extensions import SupportsIndex
 
-##def _cacheResults(function):
-##    """Decorator to cache results for functions that when given arguments return constant results."""
-##    def argsToStr(x):
-##        return '-'.join((str(i) for i in x))
-##    def kwargsToStr(x):
-##        return ';'.join((str(k)+'='+str(x[k]) for k in x))
-##    cache = {}
-##    @wraps(function)
-##    def withCache(*args, **kwargs):
-##        if DOCACHE:
-##            argstr = argsToStr(args)+'/'+kwargsToStr(kwargs)
-##            if not argstr in cache:
-##                cache[argstr] = function(*args, **kwargs)
-##            return cache[argstr]
-##        return function(*args, **kwargs)
-##    return withCache
+__all__ = [
+    "RGBToInteger",
+    "integerToRGB",
+    "RGBToHSB",
+    "HSBToRGB",
+    "integerToHSB",
+    "HSBToInteger",
+    "blend",
+    "transition",
+    "to8Bit",
+    "to24Bit",
+    "optimize",
+]
 
-##mathHuge = 2**1024 - 1
-def mathModf(x):
+
+def mathModf(x: SupportsFloat | SupportsIndex) -> tuple[float, float]:
     """Fix python math.modf ordering for lua code port."""
     fractional, intiger = modf(x)
     return intiger, fractional
 
-palette = (0x000000, 0x000040, 0x000080, 0x0000bf, 0x0000ff, 0x002400,
+
+# fmt: off
+PALETTE = (0x000000, 0x000040, 0x000080, 0x0000bf, 0x0000ff, 0x002400,
            0x002440, 0x002480, 0x0024bf, 0x0024ff, 0x004900, 0x004940,
            0x004980, 0x0049bf, 0x0049ff, 0x006d00, 0x006d40, 0x006d80,
            0x006dbf, 0x006dff, 0x009200, 0x009240, 0x009280, 0x0092bf,
@@ -77,85 +78,128 @@ palette = (0x000000, 0x000040, 0x000080, 0x0000bf, 0x0000ff, 0x002400,
            0xff92ff, 0xffb600, 0xffb640, 0xffb680, 0xffb6bf, 0xffb6ff,
            0xffdb00, 0xffdb40, 0xffdb80, 0xffdbbf, 0xffdbff, 0xffff00,
            0xffff40, 0xffff80, 0xffffbf, 0xffffff)
+# fmt: on
 
 # Note: Only implemented the more efficiant versions, as python has had
 # binary support for a pretty long time now.
 
-def RGBToInteger(r, g, b):
+
+def RGBToInteger(r: int, g: int, b: int) -> int:
     """Packs three color channels and returns a 24-bit color."""
     return r << 16 | g << 8 | b
 
-def integerToRGB(integerColor):
-    """Extrudes three color channels from a 24-bit color."""
-    return integerColor >> 16, integerColor >> 8 & 0xff, integerColor & 0xff
 
-def blend(color1, color2, transparency):
+def integerToRGB(color: int) -> tuple[int, int, int]:
+    """Extrudes three color channels from a 24-bit color."""
+    return color >> 16, color >> 8 & 0xFF, color & 0xFF
+
+
+def blend(color1: int, color2: int, transparency: float) -> int:
     """Mixes two 24 bit colors considering the transparency of the second color."""
     invertedTransparency = 1 - transparency
-    r = int(((color2 >> 16) * invertedTransparency + (color1 >> 16) * transparency) // 1) << 16
-    g = int(((color2 >> 8 & 0xff) * invertedTransparency + (color1 >> 8 & 0xff) * transparency) // 1) << 8
-    b = int(((color2 & 0xff) * invertedTransparency + (color1 & 0xff) * transparency) // 1)
+    r = (
+        int(
+            ((color2 >> 16) * invertedTransparency + (color1 >> 16) * transparency) // 1
+        )
+        << 16
+    )
+    g = (
+        int(
+            (
+                (color2 >> 8 & 0xFF) * invertedTransparency
+                + (color1 >> 8 & 0xFF) * transparency
+            )
+            // 1
+        )
+        << 8
+    )
+    b = int(
+        ((color2 & 0xFF) * invertedTransparency + (color1 & 0xFF) * transparency) // 1
+    )
     return r | g | b
 
-def transition(color1, color2, position):
+
+def transition(color1: int, color2: int, position: float) -> int:
     """Generates a transitive color between first and second ones, based on the transition argument, where the value 0.0 is equivalent to the first color, and 1.0 is the second color."""
-    r1, g1, b1 = color1 >> 16, color1 >> 8 & 0xff, color1 & 0xff
-    r2, g2, b2 = color2 >> 16, color2 >> 8 & 0xff, color2 & 0xff
+    r1, g1, b1 = color1 >> 16, color1 >> 8 & 0xFF, color1 & 0xFF
+    r2, g2, b2 = color2 >> 16, color2 >> 8 & 0xFF, color2 & 0xFF
     r = int(r1 + ((r2 - r1) * position) // 1) << 16
     g = int(g1 + ((g2 - g1) * position) // 1) << 8
     b = int(b1 + ((b2 - b1) * position) // 1)
     return r | g | b
 
+
 @cache
-def to8Bit(color24Bit):
-    """Looks to 256-color OpenComputers palette and returns the color index that most accurately matches given value using the same search method as in gpu.setBackground(value) do."""
-    r, g, b = color24Bit >> 16, color24Bit >> 8 & 0xff, color24Bit & 0xff
+def to8Bit(color_24_bit: int) -> int:
+    """Looks to 256-color OpenComputers PALETTE and returns the color index that most accurately matches given value using the same search method as in gpu.setBackground(value) do."""
+    r, g, b = color_24_bit >> 16, color_24_bit >> 8 & 0xFF, color_24_bit & 0xFF
     closestDelta, closestIndex = inf, 1
     # Moved outside of loop from original
-    # See if 24 bit color perfectly matches a palette color
-    if color24Bit in palette[1:]:
-        # If there is an entry of 24 bit color in palette, return index minus 1 because we skip first entry.
-        return palette.index(color24Bit) - 1
-    # We ignore first one, so we need to shift palette indexing by one
-    for i in range(1, len(palette)-1):
-        paletteColor = palette[i]
-        
-##        if color24Bit == paletteColor:
-##            # If color perfectly matches palette color, return palette index.
-##            return i - 1
-        paletteR, paletteG, paletteB = paletteColor >> 16, paletteColor >> 8 & 0xff, paletteColor & 0xff
-        
-        delta = (paletteR - r) ** 2 + (paletteG - g) ** 2 + (paletteB - b) ** 2
+    # See if 24 bit color perfectly matches a PALETTE color
+    if color_24_bit in PALETTE[1:]:
+        # If there is an entry of 24 bit color in PALETTE, return index minus 1 because we skip first entry.
+        return PALETTE.index(color_24_bit) - 1
+    # We ignore first one, so we need to shift PALETTE indexing by one
+    for i in range(1, len(PALETTE) - 1):
+        palette_color = PALETTE[i]
+
+        palette_r, palette_g, palette_b = (
+            palette_color >> 16,
+            palette_color >> 8 & 0xFF,
+            palette_color & 0xFF,
+        )
+
+        delta = (palette_r - r) ** 2 + (palette_g - g) ** 2 + (palette_b - b) ** 2
         if delta < closestDelta:
             closestDelta, closestIndex = delta, i
     return closestIndex - 1
 
-def to24Bit(color8Bit):
-    """The method allows you to convert the 8-bit index created by the color.to8Bit method to 24-bit color value."""
-    # We ignore first one, so we need to shift palette indexing by one
-    return palette[color8Bit + 1]
 
-def RGBToHSB(r, g, b):
+def to24Bit(color_8_bit: int) -> int:
+    """The method allows you to convert the 8-bit index created by the color.to8Bit method to 24-bit color value."""
+    return PALETTE[color_8_bit]
+
+
+def RGBToHSB(r: int, g: int, b: int) -> tuple[float, float, float]:
     """Converts three color channels of the RGB color model to the HSB color model and returns the corresponding result."""
     maxv, minv = max(r, g, b), min(r, g, b)
-    
+
     if maxv == minv:
         return 0, maxv == 0 and 0 or (1 - minv / maxv), maxv / 255
     elif maxv == r and g >= b:
-        return 60 * (g - b) / (maxv - minv), maxv == 0 and 0 or (1 - minv / maxv), maxv / 255
+        return (
+            60 * (g - b) / (maxv - minv),
+            maxv == 0 and 0 or (1 - minv / maxv),
+            maxv / 255,
+        )
     elif maxv == r and g < b:
-        return 60 * (g - b) / (maxv - minv) + 360, maxv == 0 and 0 or (1 - minv / maxv), maxv / 255
+        return (
+            60 * (g - b) / (maxv - minv) + 360,
+            maxv == 0 and 0 or (1 - minv / maxv),
+            maxv / 255,
+        )
     elif maxv == g:
-        return 60 * (b - r) / (maxv - minv) + 120, maxv == 0 and 0 or (1 - minv / maxv), maxv / 255
+        return (
+            60 * (b - r) / (maxv - minv) + 120,
+            maxv == 0 and 0 or (1 - minv / maxv),
+            maxv / 255,
+        )
     elif maxv == b:
-        return 60 * (r - g) / (maxv - minv) + 240, maxv == 0 and 0 or (1 - minv / maxv), maxv / 255
+        return (
+            60 * (r - g) / (maxv - minv) + 240,
+            maxv == 0 and 0 or (1 - minv / maxv),
+            maxv / 255,
+        )
     return 0, maxv == 0 and 0 or (1 - minv / maxv), maxv / 255
 
-def HSBToRGB(h, s, b):
+
+def HSBToRGB(h: float, s: float, b: float) -> tuple[int, int, int]:
     """Converts the parameters of the HSB color model into three color channels of the RGB model and returns the corresponding result."""
     integer, fractional = mathModf(h / 60)
-    p, q, t = b * (1 - s), b * (1 - s * fractional), b * (1 - (1 - fractional) * s)
-    
+    p = b * (1 - s)
+    q = b * (1 - s * fractional)
+    t = b * (1 - (1 - fractional) * s)
+
     if integer == 0:
         return floor(b * 255), floor(t * 255), floor(p * 255)
     elif integer == 1:
@@ -168,15 +212,18 @@ def HSBToRGB(h, s, b):
         return floor(t * 255), floor(p * 255), floor(b * 255)
     return floor(b * 255), floor(p * 255), floor(q * 255)
 
-def integerToHSB(integerColor):
-    """Convert an integer to an RGB value and then that into a HSB value."""
-    return RGBToHSB(integerToRGB(integerColor))
 
-def HSBToInteger(h, s, b):
+def integerToHSB(color: int) -> tuple[float, float, float]:
+    """Convert an integer to an RGB value and then that into a HSB value."""
+    return RGBToHSB(*integerToRGB(color))
+
+
+def HSBToInteger(h: int, s: int, b: int) -> int:
     """Convert an HSB value into an RGB value and that into an integer value."""
-    return RGBToInteger(HSBToRGB(h, s, b))
+    return RGBToInteger(*HSBToRGB(h, s, b))
+
 
 @lru_cache
-def optimize(color24Bit):
+def optimize(color_24_bit: int) -> int:
     """Get a close approximation from the OC Color Palette of given 24 bit color."""
-    return to24Bit(to8Bit(color24Bit))
+    return to24Bit(to8Bit(color_24_bit))

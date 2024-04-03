@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # This is library for efficient usage of GPU resources and rendering data on screen as fast as possible. MineOS, it's software and internal interface libraries are based on screen library.
 # -*- coding: utf-8 -*-
-
+from __future__ import annotations
 
 import Color as color
 
@@ -41,14 +41,38 @@ drawLimitY2 = bufferHeight
 
 ##GPUProxy
 GPUProxyGetResolution = lambda: 0, 0
-GPUProxySetResolution = lambda: None
-GPUProxyGetBackground = lambda: 0x000000
-GPUProxyGetForeground = lambda: 0x000000
-GPUProxySetBackground = lambda: None
-GPUProxySetForeground = lambda: None
-GPUProxyGet = lambda: None
-GPUProxySet = lambda: None
-GPUProxyFill = lambda: None
+
+
+def GPUProxySetResolution():
+    return None
+
+
+def GPUProxyGetBackground():
+    return 0
+
+
+def GPUProxyGetForeground():
+    return 0
+
+
+def GPUProxySetBackground():
+    return None
+
+
+def GPUProxySetForeground():
+    return None
+
+
+def GPUProxyGet():
+    return None
+
+
+def GPUProxySet():
+    return None
+
+
+def GPUProxyFill():
+    return None
 
 
 def tableInsert(table: dict, value: object) -> None:
@@ -62,7 +86,6 @@ def updateGPUProxyMethods(GPUProxy: object) -> None:
     global GPUProxyGetResolution, GPUProxyGetBackground, GPUProxyGetForeground
     global GPUProxySet, GPUProxySetResolution, GPUProxySetBackground, GPUProxySetForeground
     global GPUProxyFill
-    GPUProxyGet = GPUProxy.get
     GPUProxyGetResolution = GPUProxy.getResolution
     GPUProxyGetBackground = GPUProxy.getBackground
     GPUProxyGetForeground = GPUProxy.getForeground
@@ -140,8 +163,8 @@ def flush(width: int | None = None, height: int | None = None) -> None:
     bufferHeight = height
     resetDrawLimit()
 
-    for y in range(1, bufferHeight):
-        for x in range(1, bufferWidth):
+    for _y in range(1, bufferHeight):
+        for _x in range(1, bufferWidth):
             tableInsert(currentFrameBackgrounds, 0x010101)
             tableInsert(currentFrameForegrounds, 0xFEFEFE)
             tableInsert(currentFrameSymbols, " ")

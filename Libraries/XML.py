@@ -13,7 +13,7 @@ argex = 'cats="True and Sand" true=\'Cats two\' sand="graval"'
 
 
 def parseargs(string: str):
-    """Split a given string into individual arguments, separated into key:arg for <key>=(' or ")<arg>(same char as start)"""
+    """Split a given string into individual arguments, separated into key:arg for <key>=(' or ")<arg>(same char as start)."""
     arg = {}
     # ([%-%w]+)=([\"'])(.-)%2
     # '([\w]+)=([\"\'])(.*)'
@@ -50,7 +50,7 @@ def collect(string: str):
     stack = []
     top = []
     stack.append(top)
-    i, j = 0, 0
+    i, _j = 0, 0
 
     class elementTag:
         def __init__(self, label, xargs, empty=0):

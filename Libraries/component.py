@@ -27,6 +27,7 @@ def get(abbreviatedAddress):
     for addr in _Proxy.COMPONENTS:
         if addr[:leng] == abbreviatedAddress:
             return addr
+    return None
 
 
 def isAvailable(componentName):
@@ -58,7 +59,7 @@ def newRandomAddress():
 
     def getRandom(num):
         lst = []
-        for i in range(num):
+        for _i in range(num):
             lst.append(random.randint(0x0, 0xF))
         return "".join(hex(i)[2:] for i in lst)
 

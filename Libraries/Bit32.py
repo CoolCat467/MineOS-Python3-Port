@@ -93,7 +93,7 @@ def extract(n, field, width):
 
 def replace(n, v, field, width):
     """Perform n bitwise anded with the inverse of mask of width rightsifted by field, bitwise ored with the bitwise and of v and a mask of width rightshifted by field.
-    (n & ~(mask(width) << f)) | ((v & mask(width)) << f)
+    (n & ~(mask(width) << f)) | ((v & mask(width)) << f).
     """
     f, w = fieldargs(field, width)
     m = mask(w)

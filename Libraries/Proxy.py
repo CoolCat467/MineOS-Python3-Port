@@ -3,6 +3,7 @@
 # -*- coding: utf-8 -*-
 
 # Programmed by CoolCat467
+from __future__ import annotations
 
 __all__ = [
     "WARNING",
@@ -151,7 +152,7 @@ class Proxy:
     @staticmethod
     def write(stream: _IOBASE, data: str | bytes) -> tuple[bool, int | str]:
         """Write data to stream.
-        Returns the number of characters written (which is always equal to the length of the string)
+        Returns the number of characters written (which is always equal to the length of the string).
         """
         if _isStream(stream):
             if stream.writable():
@@ -162,7 +163,7 @@ class Proxy:
 
     @classmethod
     def open(cls, path: str, mode: str) -> tuple[bool, _IOBASE | str]:
-        """Opens a file at the specified path for reading or writing with specified string mode. By default, mode is r. Possible modes are: r, rb, w, wb, a and ab"""
+        """Opens a file at the specified path for reading or writing with specified string mode. By default, mode is r. Possible modes are: r, rb, w, wb, a and ab."""
         if mode in {"r", "rb", "w", "wb", "a", "ab"}:
             readAdd = mode in {"r", "rb", "a", "ab"}
             if (readAdd and cls.exists(path)) or (not readAdd):

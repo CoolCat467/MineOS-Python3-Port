@@ -117,7 +117,7 @@ def pull(preferredTimeout=None):
     while uptime < deadline:
         # Determine pullSignal timeout
         timeout = deadline
-        for halder in pairs(halders):
+        for handler in pairs(handlers):
             if handler.nextTriggerTime > 0:
                 timeout = min(timeout, handler.nextTriggerTime)
 
@@ -157,7 +157,6 @@ def pull(preferredTimeout=None):
                     shouldInterrupt = False
 
             if shouldInterrupt and uptime - lastInterrupt > interruptingDelay:
-                lastInterrupt = uptime
                 error("interrupted", 0)
         ##                raise KeyboardInterrupt()
 
@@ -168,6 +167,7 @@ def pull(preferredTimeout=None):
                 del skipSignalType[index]
             else:
                 return signalData
+    return None
 
 
 # Sleeps "time" of seconds

@@ -50,7 +50,12 @@ _REBOOT = False
 _SIGNALS = deque()
 
 _PITCHSTANDARD = 440
-HZ = lambda semitones: _PITCHSTANDARD * (2 ** (1 / 12)) ** semitones
+
+
+def HZ(semitones):
+    return _PITCHSTANDARD * (2 ** (1 / 12)) ** semitones
+
+
 _SAMPLERATE = 44100
 _BEEPS = {}
 _NEXTBEEP = 0
@@ -156,7 +161,7 @@ def runlevel():
 
 def users():
     """A list of all users registered on this computer, as a tuple."""
-    return tuple()
+    return ()
 
 
 def addUser(name):
@@ -208,10 +213,7 @@ def _beeps_threads_cleanup():
         if not _BEEPS[bid].is_alive():
             del _BEEPS[bid]
     # maybe dangerous, but keep memory down if people are playing songs or something
-    if _BEEPS:
-        _NEXTBEEP = max(_BEEPS) + 1
-    else:
-        _NEXTBEEP = 0
+    _NEXTBEEP = max(_BEEPS) + 1 if _BEEPS else 0
 
 
 def beep(frequency, duration):
@@ -233,8 +235,7 @@ def beep(frequency, duration):
     def play(filename):
         # f32le = 32 bit float encoding in Little-endian byte order
         os.system(
-            "ffplay -autoexit -showmode 0 -f f32le -ar %f %s"
-            % (_SAMPLERATE, filename),
+            f"ffplay -autoexit -showmode 0 -f f32le -ar {_SAMPLERATE:f} {filename}",
         )
 
     def _beepSound(beepId):

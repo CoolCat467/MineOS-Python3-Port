@@ -6,6 +6,7 @@
 # the RGB color model to HSB and vice versa, perform alpha blending,
 # generate color transitions and convert the color to 8-bit format for
 # the OpenComputers PALETTE.
+from __future__ import annotations
 
 from functools import cache, lru_cache
 from math import floor, inf, modf

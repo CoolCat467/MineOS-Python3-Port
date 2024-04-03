@@ -392,7 +392,7 @@ def create(
 
 def copy(picture):
     """Return a copy of given picture."""
-    v = [i for i in picture.values()]
+    v = list(picture.values())
     return _pictLstToDict(v)
 
 
@@ -492,8 +492,8 @@ def transform(picture, newWidth: int, newHeight: int):
     stepWidth, stepHeight = picture[0] / newWidth, picture[1] / newHeight
 
     x, y = 1, 1
-    for j in range(1, newHeight + 1):
-        for i in range(1, newWidth + 1):
+    for _j in range(1, newHeight + 1):
+        for _i in range(1, newWidth + 1):
             bg, fg, al, sy = get(picture, math.floor(x), math.floor(y))
             newPicture.append(bg)
             newPicture.append(fg)

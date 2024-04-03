@@ -39,5 +39,5 @@ def run():
 
 
 if __name__ == "__main__":
-    print("%s v%s\nProgrammed by %s." % (__title__, __version__, __author__))
+    print(f"{__title__} v{__version__}\nProgrammed by {__author__}.")
     run()

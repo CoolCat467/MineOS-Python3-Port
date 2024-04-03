@@ -54,6 +54,7 @@ SORTING_DATE = 3
 
 
 class string:
+    @staticmethod
     def char(bytes_):
         """Decode bytes and return string."""
         if len(bytes_) == 1:
@@ -65,6 +66,7 @@ class string:
         print(bytes_)
         raise ValueError
 
+    @staticmethod
     def byte(string_):
         """Encode string and return bytes."""
         if isinstance(string_, str):

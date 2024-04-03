@@ -34,8 +34,6 @@ class _System:
     def __repr__(cls):
         return str(cls.__dict__)
 
-    pass
-
 
 system = _System()
 
@@ -58,11 +56,9 @@ class _User:
     def __repr__(self):
         return str(self.__dict__)
 
-    pass
-
 
 def pairs(table):
-    """Return generater that iterates through the zipped keys and values of a table."""
+    """Return generator that iterates through the zipped keys and values of a table."""
     return ((k, table[k]) for k in table if table[k])
 
 

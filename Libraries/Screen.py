@@ -4,7 +4,6 @@
 
 
 import Color as color
-import Image as image
 
 colorBlend = color.blend
 
@@ -85,10 +84,16 @@ def getCurrentFrameFromTables() -> (
     tuple[dict[int, int], dict[int, int], dict[int, str]]
 ):
     """Return the current frame backgrounds, foregrounds, and symbols."""
-    return currentFrameBackgrounds, currentFrameForegrounds, currentFrameSymbols
+    return (
+        currentFrameBackgrounds,
+        currentFrameForegrounds,
+        currentFrameSymbols,
+    )
 
 
-def getNewFrameTables() -> tuple[dict[int, int], dict[int, int], dict[int, str]]:
+def getNewFrameTables() -> (
+    tuple[dict[int, int], dict[int, int], dict[int, str]]
+):
     """Return new frame tables for backgrounds, foregrounds, and symbols."""
     return newFrameBackgrounds, newFrameForegrounds, newFrameSymbols
 
@@ -96,7 +101,12 @@ def getNewFrameTables() -> tuple[dict[int, int], dict[int, int], dict[int, str]]
 def resetDrawLimit() -> None:
     """Reset the draw limit to defaults."""
     global drawLimitX1, drawLimitY1, drawLimitX2, drawLimitY2
-    drawLimitX1, drawLimitY1, drawLimitX2, drawLimitY2 = 1, 1, bufferWidth, bufferHeight
+    drawLimitX1, drawLimitY1, drawLimitX2, drawLimitY2 = (
+        1,
+        1,
+        bufferWidth,
+        bufferHeight,
+    )
 
 
 def setDrawLimit(x1: int, y1: int, x2: int, y2: int) -> None:
@@ -116,10 +126,7 @@ def flush(width: int | None = None, height: int | None = None) -> None:
     global bufferWidth, bufferHeight
 
     if not width or not height:
-        # types: error: Call to untyped function (unknown) in typed context
-        # types: error: "None" object is not iterable
         width, height = GPUProxySetResolution()
-    # types:            ^
 
     (
         currentFrameBackgrounds,
@@ -129,12 +136,8 @@ def flush(width: int | None = None, height: int | None = None) -> None:
         newFrameForegrounds,
         newFrameSymbols,
     ) = ({}, {}, {}, {}, {}, {})
-    # types: error: Incompatible types in assignment (expression has type "Optional[int]", variable has type "int")
     bufferWidth = width
-    # types:      ^
-    # types: error: Incompatible types in assignment (expression has type "Optional[int]", variable has type "int")
     bufferHeight = height
-    # types:       ^
     resetDrawLimit()
 
     for y in range(1, bufferHeight):
@@ -150,11 +153,7 @@ def flush(width: int | None = None, height: int | None = None) -> None:
 
 def setResolution(width: int, height: int) -> None:
     """Set the resolution on the GPU Proxy and flush the frame buffers."""
-    # types: error: Call to untyped function (unknown) in typed context
-    # types: error: Too many arguments
-    # types: error: Name "hight" is not defined
-    GPUProxySetResolution(width, hight)
-    # types:                     ^
+    GPUProxySetResolution(width, height)
     flush(width, height)
 
 
@@ -166,7 +165,6 @@ def getResolution() -> tuple[int, int]:
 def setGPUProxy(proxy: str) -> None:
     """Set the GPU Proxy."""
     global GPUProxy
-    # types: error: Name "GPUProxy" is not defined
     GPUProxy = proxy
     updateGPUProxyMethods()
     flush()

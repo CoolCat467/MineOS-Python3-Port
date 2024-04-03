@@ -81,19 +81,20 @@ def fieldargs(field, width):
     w = width or 1
     assert field >= 0, "Field cannot be negative."
     assert w > 0, "Width must be positive."
-    assert field + w <= 32, "Bits accessed excede 32."
+    assert field + w <= 32, "Bits accessed exceed 32."
     return field, w
 
 
 def extract(n, field, width):
-    """Preform n bitwise shifted right by field, bitwise anded with a mask of width."""
+    """Perform n bitwise shifted right by field, bitwise anded with a mask of width."""
     f, w = fieldargs(field, width)
     return (n >> f) & mask(w)
 
 
 def replace(n, v, field, width):
-    """Preform n bitwise anded with the inverse of mask of width rightsifted by field, bitwise ored with the bitwise and of v and a mask of width rightshifted by field.
-    (n & ~(mask(width) << f)) | ((v & mask(width)) << f)"""
+    """Perform n bitwise anded with the inverse of mask of width rightsifted by field, bitwise ored with the bitwise and of v and a mask of width rightshifted by field.
+    (n & ~(mask(width) << f)) | ((v & mask(width)) << f)
+    """
     f, w = fieldargs(field, width)
     m = mask(w)
     return (n & ~(m << f)) | ((v & m) << f)

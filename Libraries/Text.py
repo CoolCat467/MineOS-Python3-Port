@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-# TITLE DISCRIPTION
+# TITLE DESCRIPTION
 # -*- coding: utf-8 -*-
 
 from math import inf, modf
 
 
-def serialize(table, prettyLook=False, indentator="  ", recursionStackLimit=inf):
+def serialize(
+    table,
+    prettyLook=False,
+    indentator="  ",
+    recursionStackLimit=inf,
+):
     equalsSymbol = prettyLook and " = " or "="
 
     def serialize_(t, currentIndentationSymbol, currentRecursionStack):
@@ -33,13 +38,15 @@ def serialize(table, prettyLook=False, indentator="  ", recursionStackLimit=inf)
             if isinstance(value, (int, float, bool, type(None))):
                 result += str(value)
             elif isinstance(value, (str, type(lambda x: None))):
-                result += f'"{str(value)}"'
+                result += f'"{value!s}"'
             elif isinstance(value, dict):
                 if currentRecursionStack < recursionStackLimit:
                     result += "".join(
                         serialize_(
-                            value, nextIndentationSymbol, currentRecursionStack + 1
-                        )
+                            value,
+                            nextIndentationSymbol,
+                            currentRecursionStack + 1,
+                        ),
                     )
                 else:
                     result += '"…"'  # ..."'
@@ -68,11 +75,13 @@ def deserialize(string):
 
 
 def brailleChar(a, b, c, d, e, f, g, h):
-    return chr(10240 + 128 * h + 64 * g + 32 * f + 16 * d + 8 * b + 4 * e + 2 * c + a)
+    return chr(
+        10240 + 128 * h + 64 * g + 32 * f + 16 * d + 8 * b + 4 * e + 2 * c + a,
+    )
 
 
 def unicodeFind(string, pattern, init, plain):
-    if not init is None:
+    if init is not None:
         if init < 0:
             init = -len(string[init:])
         elif init > 0:
@@ -128,7 +137,7 @@ def wrap(data, limit):
     i = 0
     while i < len(wrappedLines) - 1:
         position = wrappedLines[i].find("\n")
-        if not position == -1:
+        if position != -1:
             ##            wrappedLines[i+1] += wrappedLines[i][position:]
             wrappedLines[i] = wrappedLines[i][:position]
 

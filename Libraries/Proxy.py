@@ -4,7 +4,14 @@
 
 # Programmed by CoolCat467
 
-__all__ = ["WARNING", "LIBRARIES", "MINEOS", "OPENCOMPUTERS", "COMPONENTS", "Proxy"]
+__all__ = [
+    "WARNING",
+    "LIBRARIES",
+    "MINEOS",
+    "OPENCOMPUTERS",
+    "COMPONENTS",
+    "Proxy",
+]
 
 WARNING = True
 
@@ -21,17 +28,17 @@ COMPONENTS: dict[int, Any] = {}
 
 
 def _isStream(stream: object) -> bool:
-    "Return wether stream argument is an instance of io.IOBase."
+    """Return whether stream argument is an instance of io.IOBase."""
     return isinstance(stream, _IOBASE)
 
 
 def _realPath(fakePath: str) -> str:
-    "Return the real path of a given open computers path."
+    """Return the real path of a given open computers path."""
     return _os.path.join(OPENCOMPUTERS, fakePath[1:])
 
 
 def _fakePath(realPath: str) -> str:
-    "Return the open computers path of a real path."
+    """Return the open computers path of a real path."""
     return realPath.split(OPENCOMPUTERS)[1]
 
 
@@ -45,12 +52,12 @@ class Proxy:
 
     @staticmethod
     def exists(path: str) -> bool:
-        "Checks if file or directory exists on given path."
+        """Checks if file or directory exists on given path."""
         return _os.path.exists(_realPath(path))
 
     @classmethod
     def size(cls, path: str) -> tuple[bool, str | int]:
-        "Tries to get file size by given path in bytes. Returns size on success, False and reason message otherwise."
+        """Tries to get file size by given path in bytes. Returns size on success, False and reason message otherwise."""
         ##        return False, 'File does not exist.'#success int or False, message
         if cls.exists(path):
             try:
@@ -62,12 +69,12 @@ class Proxy:
 
     @staticmethod
     def isDirectory(path: str) -> bool:
-        "Checks if given path is a directory or a file."
+        """Checks if given path is a directory or a file."""
         return _os.path.isdir(_realPath(path))
 
     @staticmethod
     def makeDirectory(path: str) -> tuple[bool, str | None]:
-        "Tries to create directory with all sub-paths by given path. Returns True on success, False and reason message otherwise."
+        """Tries to create directory with all sub-paths by given path. Returns True on success, False and reason message otherwise."""
         try:
             _os.mkdir(_realPath(path), 664)
         except OSError:
@@ -76,7 +83,7 @@ class Proxy:
 
     @classmethod
     def lastModified(cls, path: str) -> tuple[int, str | None]:
-        "Tries to get real world timestamp when file or directory by given path was modified. For directories this is usually the time of their creation. Returns timestamp on success, False and reason message otherwise."
+        """Tries to get real world timestamp when file or directory by given path was modified. For directories this is usually the time of their creation. Returns timestamp on success, False and reason message otherwise."""
         if cls.exists(path):
             time = _os.path.getmtime(_realPath(path))
             ##            return math.ceil(time), None
@@ -85,10 +92,10 @@ class Proxy:
 
     @staticmethod
     def remove(path: str) -> tuple[bool, str]:
-        "Tries to remove file or directory by given path. Returns True on success, False and reason message otherwise."
+        """Tries to remove file or directory by given path. Returns True on success, False and reason message otherwise."""
         if WARNING:
             ok = input(
-                f"WARNING: Removing file {_realPath(path)}. Ok? (y/N) : "
+                f"WARNING: Removing file {_realPath(path)}. Ok? (y/N) : ",
             ).lower()
             if ok == "":
                 ok == "n"
@@ -99,7 +106,7 @@ class Proxy:
 
     @classmethod
     def list(cls, path: str) -> tuple[bool, Sequence[str]]:
-        "Tries to get list of files and directories from given path. Returns table with list on success, False and reason message otherwise."
+        """Tries to get list of files and directories from given path. Returns table with list on success, False and reason message otherwise."""
         if cls.exists(path):
             if cls.isDirectory(path):
                 return True, _os.listdir(_realPath(path))
@@ -109,9 +116,11 @@ class Proxy:
 
     @staticmethod
     def seek(
-        stream: _IOBASE, position: str = "cur", offset: int = 0
+        stream: _IOBASE,
+        position: str = "cur",
+        offset: int = 0,
     ) -> tuple[bool, str | int]:
-        "If seek is successful, returns the new absolute position, None, measured in bytes from the beginning of the file. Otherwise it returns None and string reason."
+        """If seek is successful, returns the new absolute position, None, measured in bytes from the beginning of the file. Otherwise it returns None and string reason."""
         ##        return False, 'Stream is invalid.'
         if _isStream(stream):
             if stream.seekable():
@@ -119,7 +128,6 @@ class Proxy:
                     whence = {"set": 0, "cur": 1, "end": 2}[position]
                     if isinstance(offset, int):
                         return True, stream.seek(offset, whence)
-                    # types: error: Statement is unreachable
                     return False, "Invalid offset."
                 return False, "Invalid position."
             return False, "Stream is not seekable."
@@ -127,13 +135,13 @@ class Proxy:
 
     @staticmethod
     def close(stream: _IOBASE) -> None:
-        "Close file stream."
+        """Close file stream."""
         if _isStream(stream):
             stream.close()
 
     @staticmethod
     def read(stream: _IOBASE, buffer_size: int = -1) -> tuple[bool, int | str]:
-        "Read exactly buffer_size or less from a file stream."
+        """Read exactly buffer_size or less from a file stream."""
         if _isStream(stream):
             if stream.readable():
                 return True, stream.read(buffer_size)
@@ -154,15 +162,13 @@ class Proxy:
 
     @classmethod
     def open(cls, path: str, mode: str) -> tuple[bool, _IOBASE | str]:
-        "Opens a file at the specified path for reading or writing with specified string mode. By default, mode is r. Possible modes are: r, rb, w, wb, a and ab"
+        """Opens a file at the specified path for reading or writing with specified string mode. By default, mode is r. Possible modes are: r, rb, w, wb, a and ab"""
         if mode in {"r", "rb", "w", "wb", "a", "ab"}:
             readAdd = mode in {"r", "rb", "a", "ab"}
             if (readAdd and cls.exists(path)) or (not readAdd):
                 if not cls.isDirectory(path):
                     try:
-                        # types: error: Incompatible return value type (got "Tuple[bool, IO[Any]]", expected "Tuple[bool, Union[IOBase, str]]")
                         return True, open(_realPath(path), mode=mode)
-                    # types:   ^
                     except BaseException:
                         return False, "Cannot open file stream."
                 name = _os.path.split(_os.path.dirname(_realPath(path)))[1]
@@ -172,7 +178,7 @@ class Proxy:
 
     @classmethod
     def rename(cls, fromPath: str, toPath: str) -> tuple[bool, str | None]:
-        "Tries to rename file or directory from first path to second one. Returns True on success, False and reason message otherwise."
+        """Tries to rename file or directory from first path to second one. Returns True on success, False and reason message otherwise."""
         if cls.exists(fromPath):
             try:
                 _os.rename(_realPath(fromPath), _realPath(toPath))

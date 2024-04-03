@@ -41,7 +41,6 @@ import math
 
 import Bit32 as bit32
 import component
-import computer
 import Event as event
 import Paths as paths
 
@@ -56,7 +55,7 @@ SORTING_DATE = 3
 
 class string:
     def char(bytes_):
-        "Decode bytes and return string."
+        """Decode bytes and return string."""
         if len(bytes_) == 1:
             return ord(bytes_)
         if isinstance(bytes_, bytes):
@@ -67,7 +66,7 @@ class string:
         raise ValueError
 
     def byte(string_):
-        "Encode string and return bytes."
+        """Encode string and return bytes."""
         if isinstance(string_, str):
             return string_.encode("utf-8")
         elif isinstance(string_, int):
@@ -76,11 +75,9 @@ class string:
             return string_
         raise ValueError
 
-    pass
-
 
 def pairs(table):
-    "Return generater that iterates through the zipped keys and values of a table."
+    """Return generator that iterates through the zipped keys and values of a table."""
     return ((k, table[k]) for k in table if table[k])
 
 
@@ -93,16 +90,14 @@ class _mountProxy:
         self.path = path
         self.proxy = proxy
 
-    pass
-
 
 def path(path_):
-    "Returns parent path from given path."
+    """Returns parent path from given path."""
     return "/".join(path_.split("/")[:-1]) + "/"
 
 
 def name(path_):
-    "Returns file name from given path. Keeps end slash if any."
+    """Returns file name from given path. Keeps end slash if any."""
     add = ""
     if path_.endswith("/"):
         path_ = path_[:-1]
@@ -111,37 +106,40 @@ def name(path_):
 
 
 def extension(path_):
-    "Returns extension from given path. Skips end slash if any."
+    """Returns extension from given path. Skips end slash if any."""
     if path_.endswith("/"):
         path_ = path_[:-1]
     filename = path_.split("/")[-1]
-    if not "." in filename:
+    if "." not in filename:
         return None
     return "." + filename.split(".")[1]
 
 
 def hideExtension(path_):
-    "Returns given path without it's extension"
+    """Returns given path without it's extension"""
     spPath = path_.split("/")
     spPath[-1] = spPath[-1].split(".")[0]
     return "/".join(spPath)
 
 
 def isHidden(path_):
-    "Hidden files are files which names starts of dot symbol. This method returns True if file is hidden or False otherwise."
+    """Hidden files are files which names starts of dot symbol. This method returns True if file is hidden or False otherwise."""
     return path_[0] == "."
 
 
 def removeSlashes(path_):
-    "Remove slashes from path_."
+    """Remove slashes from path_."""
     return "/".join([i for i in path_.split("/") if i != ""])
 
 
 def mount(proxy, path_):
-    "Mounts passed filesystem component proxy table to specified path."
+    """Mounts passed filesystem component proxy table to specified path."""
     for mp in mountedProxies:
         if mp.path == path_:
-            return False, "Mount path has been taken by another mounted filesystem."
+            return (
+                False,
+                "Mount path has been taken by another mounted filesystem.",
+            )
         elif mp.proxy == proxy:
             return False, "Proxy is already mounted."
 
@@ -150,7 +148,7 @@ def mount(proxy, path_):
 
 
 def unmount(proxy):
-    "Unmounts passed filesystem component proxy table or it's string address from mounted path."
+    """Unmounts passed filesystem component proxy table or it's string address from mounted path."""
     if isinstance(proxy, (dict, list, tuple)):
         for i in range(len(mountedProxies)):
             if mountedProxies[i].proxy == proxy:
@@ -164,11 +162,13 @@ def unmount(proxy):
                 return True, None
         return False, "Specified proxy address is not mounted."
     ##    else:
-    error(f"Bad argument (filesystem proxy or mounted path expected, got {proxy}).")
+    error(
+        f"Bad argument (filesystem proxy or mounted path expected, got {proxy}).",
+    )
 
 
 def get(path_):
-    "Determines correct filesystem component proxy from given path and returns it with rest path part."
+    """Determines correct filesystem component proxy from given path and returns it with rest path part."""
     if not isinstance(path_, str):
         print(path_)
         error("Invalid argument.")
@@ -179,55 +179,55 @@ def get(path_):
 
 
 def mounts():
-    "Returns an iterator function for listing of mounted filesystems."
+    """Returns an iterator function for listing of mounted filesystems."""
     return ((mp.proxy, mp.path) for mp in mountedProxies if mp)
 
 
 def exists(path):
-    "Checks if file or directory exists on given path."
+    """Checks if file or directory exists on given path."""
     proxy, proxyPath = get(path)
     return proxy.exists(proxyPath)
 
 
 def size(path_):
-    "Tries to get file size by given path in bytes. Returns size on success, False and reason message otherwise."
+    """Tries to get file size by given path in bytes. Returns size on success, False and reason message otherwise."""
     proxy, proxyPath = get(path_)
     return proxy.size(proxyPath)
 
 
 def isDirectory(path_):
-    "Checks if given path is a directory or a file."
+    """Checks if given path is a directory or a file."""
     proxy, proxyPath = get(path_)
     return proxy.isDirectory(proxyPath)
 
 
 def makeDirectory(path_):
-    "Tries to create directory with all sub-paths by given path. Returns True on success, False and reason message otherwise."
+    """Tries to create directory with all sub-paths by given path. Returns True on success, False and reason message otherwise."""
     proxy, proxyPath = get(path_)
     return proxy.makeDirectory(proxyPath)
 
 
 def lastModified(path_):
-    "Tries to get real world timestamp when file or directory by given path was modified. For directories this is usually the time of their creation. Returns timestamp on success, False and reason message otherwise."
+    """Tries to get real world timestamp when file or directory by given path was modified. For directories this is usually the time of their creation. Returns timestamp on success, False and reason message otherwise."""
     proxy, proxyPath = get(path_)
     return proxy.lastModified(proxyPath)
 
 
 def remove(path_):
-    "Tries to remove file or directory by given path. Returns True on success, False and reason message otherwise."
+    """Tries to remove file or directory by given path. Returns True on success, False and reason message otherwise."""
     proxy, proxyPath = get(path_)
     return proxy.remove(proxyPath)
 
 
 def list_(path_, sortingMethod=SORTING_NAME):
-    "Tries to get list of files and directories from given path. Returns table with list on success, False and reason message otherwise."
+    """Tries to get list of files and directories from given path. Returns table with list on success, False and reason message otherwise."""
     proxy, proxyPath = get(path_)
 
     list__, reason = proxy.list(proxyPath)
     ##    list_, reason = ['computer.py', 'Event.py', 'py', 'Screen.py', 'Color.py', '__pycache__', 'Paths.py'], None
 
     if not reason and list__:
-        # Fullfill list with mounted paths if needed
+        # Fill list with mounted paths if needed
         for mp in mountedProxies:
             if path_ == path(mp.path):
                 list__.append(name(mp.path))
@@ -237,36 +237,38 @@ def list_(path_, sortingMethod=SORTING_NAME):
             list__.sort(lambda a, b: a.lower() < b.lower())
             return list__, None
         elif sortingMethod == SORTING_DATE:
-            list__.sort(lambda a, b: lastModified(path_ + a) > lastModified(path_ + b))
+            list__.sort(
+                lambda a, b: lastModified(path_ + a) > lastModified(path_ + b),
+            )
             return list__, None
         elif sortingMethod == SORTING_TYPE:
-            # Create a map with "extention" structure
+            # Create a map with "extension" structure
             map_ = {}
             for file in list__:
-                if not "." in file and isDirectory(path_ + file):
+                if "." not in file and isDirectory(path_ + file):
                     extention_ = "."
                 else:
                     extention_ = extension(file) or "Z"
 
-                if not extention_ in map_:
+                if extention_ not in map_:
                     map_[extention_] = []
                 map_[extention_].append(file)
 
-            # Sort lists for each extention
-            extentions = {}
+            # Sort lists for each extension
+            extensions = {}
             for key, value in pairs(map_):
                 value.sort(lambda a, b: a.lower() < b.lower())
 
-                extentions[key] = value
+                extensions[key] = value
 
-            # Sort extentions
-            keys = list(extentions.keys())
+            # Sort extensions
+            keys = list(extensions.keys())
             keys.sort(lambda a, b: a.lower() < b.lower())
 
             # Create final list:
             list__ = []
             for key in keys:
-                for value in extentions[key]:
+                for value in extensions[key]:
                     list__.append(value)
 
             return list__, None
@@ -279,7 +281,7 @@ def list_(path_, sortingMethod=SORTING_NAME):
 
 
 def _getForMode(string_, mode):
-    "Get the proper string for given mode."
+    """Get the proper string for given mode."""
     if "b" in mode:
         return string.byte(string_)
     return string.char(string_)
@@ -311,11 +313,17 @@ class _Handle:
         if position == "set":
             result, reason = self.proxy.seek(self.stream, "set", offset)
         elif position == "cur":
-            result, reason = self.proxy.seek(self.stream, "set", self.position + offset)
+            result, reason = self.proxy.seek(
+                self.stream,
+                "set",
+                self.position + offset,
+            )
         elif position == "end":
             result, reason = self.proxy.seek(self.stream, "end", offset)
         else:
-            error(f"Bad argument #2 ('set', 'cur', or 'end' expected, got {position})")
+            error(
+                f"Bad argument #2 ('set', 'cur', or 'end' expected, got {position})",
+            )
         if reason is None:
             self.position = result
             self.buffer = ""
@@ -323,14 +331,14 @@ class _Handle:
         error(f"{reason}")
 
     def close(self):
-        "Closes file stream, flushes internal buffer and releases the handle."
+        """Closes file stream, flushes internal buffer and releases the handle."""
         if "w" in self.mode and len(self.buffer) > 0:
             self.proxy.write(self.stream, self.buffer)
 
         self.proxy.close(self.stream)
 
     def readString(self, count):
-        "Reads string with length of given count of bytes. Returns string value or None if EOF has reached."
+        """Reads string with length of given count of bytes. Returns string value or None if EOF has reached."""
         # If current buffer content is a "part" of "count data" we need to read
         if count > len(self.buffer):
             data = self.buffer
@@ -365,7 +373,7 @@ class _Handle:
         return data
 
     def readLine(self):
-        "Reads next line from file without \n character. Returns string line or None if EOF has reached."
+        """Reads next line from file without \n character. Returns string line or None if EOF has reached."""
         data = _getForMode("", self.mode)
 
         linebreak = _getForMode("\n", self.mode)
@@ -375,10 +383,10 @@ class _Handle:
                 if eofidx >= 0:
                     chunk = self.buffer[:eofidx]
                     self.buffer = self.buffer[eofidx:]
-                    self.position += len(chunck)
+                    self.position += len(chunk)
 
-                    ##                    return data + chunck
-                    return string.char(data + chunck)
+                    ##                    return data + chunk
+                    return string.char(data + chunk)
                 else:
                     data += self.buffer
 
@@ -396,7 +404,7 @@ class _Handle:
                 return len(data) > 0 and string.char(data) or None
 
     def lines(self):
-        "Return a generator object that will return lines, and on EOF close self."
+        """Return a generator object that will return lines, and on EOF close self."""
 
         def lineGen():
             while True:
@@ -412,7 +420,7 @@ class _Handle:
         return lineGen
 
     def readAll(self):
-        "Reads whole file as string. Returns string data if reading operation was successful, None and reason message otherwise."
+        """Reads whole file as string. Returns string data if reading operation was successful, None and reason message otherwise."""
         data = _getForMode("", self.mode)
         while True:
             chunk, error_ = self.proxy.read(self.stream, BUFFER_SIZE)
@@ -428,7 +436,7 @@ class _Handle:
         return string.char(data)
 
     def readBytes(self, count, littleEndian=False):
-        "Reads number represented by count of bytes in big endian format by default or little endian if desired. Returns int value or None if EOF has reached."
+        """Reads number represented by count of bytes in big endian format by default or little endian if desired. Returns int value or None if EOF has reached."""
         if count == 1:
             data = self.readString(1)
             if data:
@@ -448,9 +456,9 @@ class _Handle:
             return result
 
     def readUnicodeChar(self):
-        "Reads next bytes (up to 6 from current position) as char in UTF-8 encoding. Returns string value or nil if EOF has reached."
+        """Reads next bytes (up to 6 from current position) as char in UTF-8 encoding. Returns string value or nil if EOF has reached."""
         byteArray = [
-            string.byte(self.readString(1))
+            string.byte(self.readString(1)),
         ]  # bytearray(bytes(self.readString(1)))
 
         nullBitPos = 0
@@ -469,7 +477,7 @@ class _Handle:
         return "".join([chr(int(i)) for i in fullbytes])
 
     def read(self, format_, bytesSize=1):
-        "Read from this handle in a given format."
+        """Read from this handle in a given format."""
         if isinstance(format_, int):
             return self.readString(format_)
         elif isinstance(format_, str):
@@ -487,14 +495,14 @@ class _Handle:
                 return self.readUnicodeChar()
             else:
                 error(
-                    f"Bad argument #2 ('a' (whole file), 'l' (line), 'u' (unicode char), 'b' (byte as number) or 'bs' (sequence of n bytes as number) expected, got {type(_format)})"
+                    f"Bad argument #2 ('a' (whole file), 'l' (line), 'u' (unicode char), 'b' (byte as number) or 'bs' (sequence of n bytes as number) expected, got {type(_format)})",
                 )
         error(f"Bad argument #1 (int or str expected, got {type(format_)}).")
 
     def write(self, *write_):
-        "Writes passed arguments to file. Returns True, None on success, False and reason message otherwise. Arguments may have str, int, or bool type."
+        """Writes passed arguments to file. Returns True, None on success, False and reason message otherwise. Arguments may have str, int, or bool type."""
         blank = _getForMode("", self.mode)
-        data = blank.join((_getForMode(thing, self.mode) for thing in write_))
+        data = blank.join(_getForMode(thing, self.mode) for thing in write_)
 
         # If data is small enough to fit in a buffer
         if len(data) < (BUFFER_SIZE - len(self.buffer)):
@@ -505,12 +513,17 @@ class _Handle:
         # Write current buffer content
         success, reason = self.proxy.write(self.stream, self.buffer)
         if success:
-            # If data will not fit in buffer, use iterative writeing with data partitioning
+            # If data will not fit in buffer, use iterative writing with data partitioning
             if len(data) > BUFFER_SIZE:
-                for i in range(0, math.ceil(len(data) / BUFFER_SIZE), BUFFER_SIZE):
+                for i in range(
+                    0,
+                    math.ceil(len(data) / BUFFER_SIZE),
+                    BUFFER_SIZE,
+                ):
                     ##                    print(data[i:i+BUFFER_SIZE])
                     success, reason = self.proxy.write(
-                        self.stream, data[i : i + BUFFER_SIZE]
+                        self.stream,
+                        data[i : i + BUFFER_SIZE],
                     )
 
                     if not success:
@@ -529,26 +542,25 @@ class _Handle:
         return False, reason
 
     def writeBytes(self, *args):
-        "Writes passed numbers in [0; 255] range as bytes to file. Returns True, None on success, False and reason message otherwise."
+        """Writes passed numbers in [0; 255] range as bytes to file. Returns True, None on success, False and reason message otherwise."""
         ##        if len(args) > 1:
         ##            print([string.byte(i) for i in args])
         return self.write(
-            *[string.byte(i) for i in args]
+            *[string.byte(i) for i in args],
         )  # b''.join(bytearray(args)).decode('utf-8'))
 
     def __bool__(self):
         return True
 
-    pass
-
 
 def open_(path_, mode):
     """Opens a file at the specified path for reading or writing with specified string mode. By default, mode is r. Possible modes are: r, rb, w, wb, a and ab. If file has been opened, returns file handle table or None and string error otherwise.
 
-    Independent of mode, every handle will have a close and seek methods"""
-    if not mode in ("r", "rb", "w", "wb", "a", "ab"):
+    Independent of mode, every handle will have a close and seek methods
+    """
+    if mode not in ("r", "rb", "w", "wb", "a", "ab"):
         error(
-            f"Bad argument #2 ('a' (whole file), 'l' (line), 'u' (unicode char), 'b' (byte as number) or 'bs' (sequence of n bytes as number) expected, got {type(_format)})"
+            f"Bad argument #2 ('a' (whole file), 'l' (line), 'u' (unicode char), 'b' (byte as number) or 'bs' (sequence of n bytes as number) expected, got {type(_format)})",
         )
     proxy, proxyPath = get(path_)
     stream, reason = proxy.open(proxyPath, mode)
@@ -561,7 +573,7 @@ def open_(path_, mode):
 
 
 def copy(fromPath, toPath):
-    "Tries to copy file from first path to second one. Returns True on success, False and reason message otherwise."
+    """Tries to copy file from first path to second one. Returns True on success, False and reason message otherwise."""
 
     def copyRecursively(fromPath, toPath):
         if isDirectory(fromPath):
@@ -584,15 +596,14 @@ def copy(fromPath, toPath):
                             toHandle.close()
                             fromHandle.close()
                             break
-                return False, f'Cannot aquire handle for path "{toPath}"'
-            return False, f'Cannot aquire handle for path "{fromHandle}"'
-        pass
+                return False, f'Cannot acquire handle for path "{toPath}"'
+            return False, f'Cannot acquire handle for path "{fromHandle}"'
 
     return copyRecursively(fromPath, toPath)
 
 
 def rename(fromPath, toPath):
-    "Tries to rename file or directory from first path to second one. Returns True on success, False and reason message otherwise."
+    """Tries to rename file or directory from first path to second one. Returns True on success, False and reason message otherwise."""
     fromProxy, fromProxyPath = get(fromPath)
     toProxy, toProxyPath = get(toPath)
 
@@ -607,7 +618,7 @@ def rename(fromPath, toPath):
 
 
 def read(path_):
-    "Reads whole file as string. Returns string data, None if reading operation was successful, None and reason message otherwise."
+    """Reads whole file as string. Returns string data, None if reading operation was successful, None and reason message otherwise."""
     handle, reason = open_(path_, "rb")
     if reason is None:
         data = handle.readAll()
@@ -632,7 +643,7 @@ def lines(path_):
 
 
 def readLines(path_):
-    "Reads string lines from file and packs them to table. Returns table of strings, None if reading operation was successful, None and reason message otherwise."
+    """Reads string lines from file and packs them to table. Returns table of strings, None if reading operation was successful, None and reason message otherwise."""
     handle, reason = open_(path, "rb")
     if handle:
         lines, index = {}, _infgen()
@@ -648,7 +659,7 @@ def readLines(path_):
 
 
 def _writeOrAppend(append, path_, *write):
-    "Return status, reason of handle.write(*args) where handle is retrieved from path_."
+    """Return status, reason of handle.write(*args) where handle is retrieved from path_."""
     makeDirectory(path(path_))
 
     mode = {True: "ab", False: "wb"}[bool(append)]
@@ -664,17 +675,17 @@ def _writeOrAppend(append, path_, *write):
 
 
 def write(path_, *write_):
-    "Overwrites file with passed data. Data can be a string, number or boolean type. Returns True, None if writing operation was successful, False and reason message otherwise."
+    """Overwrites file with passed data. Data can be a string, number or boolean type. Returns True, None if writing operation was successful, False and reason message otherwise."""
     return _writeOrAppend(False, path_, *write_)
 
 
 def append(path_, *append_):
-    "Works the same way as filesystem.write(), but appends passed data to end of file without overwriting."
+    """Works the same way as filesystem.write(), but appends passed data to end of file without overwriting."""
     return _writeOrAppend(True, path_, *append_)
 
 
 def writeTable(path_, *table):
-    "Serializes given table as string and writes it to file. Multiple arguments are passed to text.serialize method. Returns True, None if serializing and writing operation was successful, False and reason message otherwise."
+    """Serializes given table as string and writes it to file. Multiple arguments are passed to text.serialize method. Returns True, None if serializing and writing operation was successful, False and reason message otherwise."""
     import Text
 
     serialized = Text.serialize(*table)
@@ -683,7 +694,7 @@ def writeTable(path_, *table):
 
 
 def readTable(path_):
-    "Reads whole file and deserializes it as table. Returns table, None if reading operation was successful, None and reason message otherwise."
+    """Reads whole file and deserializes it as table. Returns table, None if reading operation was successful, None and reason message otherwise."""
     result, reason = read(path_)
     if result:
         import Text
@@ -695,18 +706,18 @@ def readTable(path_):
 
 
 def setProxy(proxy):
-    "Sets the boot proxy to given proxy."
+    """Sets the boot proxy to given proxy."""
     global BOOT_PROXY
     BOOT_PROXY = proxy
 
 
 def getProxy():
-    "Return the boot proxy."
+    """Return the boot proxy."""
     return BOOT_PROXY
 
 
 def loadfile(path_):
-    "Load file from path as a module."
+    """Load file from path as a module."""
     data, reason = read(path_)
     if data:
         moduleName = hideExtension(path_)
@@ -726,7 +737,7 @@ def loadfile(path_):
 
 
 def doFile(path_, *args, **kwargs):
-    "Execute a given file from path with arguments."
+    """Execute a given file from path with arguments."""
     result, reason = loadfile(path_)
     if result:
         data = result(*args, **kwargs)

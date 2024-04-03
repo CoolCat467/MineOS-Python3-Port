@@ -87,7 +87,7 @@
 	flashEEPROM = "Записати на EEPROM",
 	flashingEEPROM = "Запис в процесі. Не вимикайте комп'ютер...",
 	print3D = "Роздрукувати модель",
-	
+
 	sortBy = "Сортувати",
 	sortByType = "По типу",
 	sortByName = "По імені",

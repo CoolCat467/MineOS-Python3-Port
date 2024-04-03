@@ -56,7 +56,7 @@
 	folder = "Папка",
 	unknown = "Неизвестно",
 	calculatingSize = "идет подсчет…",
-	
+
 	properties = "Свойства",
 	newFolderFromChosen = "Новая папка из выбранного",
 	create = "Создать",

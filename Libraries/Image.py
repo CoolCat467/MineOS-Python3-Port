@@ -81,8 +81,6 @@ class Picture:
     def __repr__(self):
         return self.getStr()
 
-    pass
-
 
 ##def readOutput(output):
 ##    "Return True, output, None if output does not have error reason, and False, output, reason if it does."
@@ -91,7 +89,7 @@ class Picture:
 
 
 def group(picture, compressColors=False):
-    "Simplify a picture into a gigantic table."
+    """Simplify a picture into a gigantic table."""
     groupedPicture = {}
     x, y = 1, 1
     ##    print((2, len(picture), 4))
@@ -99,11 +97,11 @@ def group(picture, compressColors=False):
     for i in range(2, len(picture), 4):
         if compressColors:
             background, foreground = color.to8Bit(picture[i]), color.to8Bit(
-                picture[i + 1]
+                picture[i + 1],
             )
             ##            # Skipping because it's very strange.
             if i % 603 == 0:
-                # Handle signals for zero secconds? What?
+                # Handle signals for zero seconds? What?
                 # If it's computer's pullSignal, we are making event
                 # module not process signals. Interesting.
                 computer.pullSignal(0)
@@ -111,15 +109,15 @@ def group(picture, compressColors=False):
             background, foreground = picture[i], picture[i + 1]
         alpha, char = picture[i + 2], picture[i + 3]
 
-        if not alpha in groupedPicture:
+        if alpha not in groupedPicture:
             groupedPicture[alpha] = {}
-        if not char in groupedPicture[alpha]:
+        if char not in groupedPicture[alpha]:
             groupedPicture[alpha][char] = {}
-        if not background in groupedPicture[alpha][char]:
+        if background not in groupedPicture[alpha][char]:
             groupedPicture[alpha][char][background] = {}
-        if not foreground in groupedPicture[alpha][char][background]:
+        if foreground not in groupedPicture[alpha][char][background]:
             groupedPicture[alpha][char][background][foreground] = {}
-        if not y in groupedPicture[alpha][char][background][foreground]:
+        if y not in groupedPicture[alpha][char][background][foreground]:
             groupedPicture[alpha][char][background][foreground][y] = []
 
         groupedPicture[alpha][char][background][foreground][y].append(x)
@@ -132,7 +130,7 @@ def group(picture, compressColors=False):
 
 
 def encMethodSave5(file, picture):
-    "Save an picture to a file."
+    """Save an picture to a file."""
     file.writeBytes(bit32.rshift(picture[0], 8), bit32.band(picture[1], 0xFF))
 
     for i in range(2, len(picture), 4):
@@ -150,7 +148,7 @@ encodingMethodsSave[5] = encMethodSave5
 
 
 def encMethodLoad5(file, picture):
-    "Load a picture from a file."
+    """Load a picture from a file."""
     picture[0] = file.readBytes(2)
     picture[1] = file.readBytes(2)
 
@@ -166,7 +164,7 @@ encodingMethodsLoad[5] = encMethodLoad5
 
 
 def encMethodSave6(file, picture):
-    "Save groups of the same objects."
+    """Save groups of the same objects."""
     # Grouping an image by it's alphas, symbols, and colors
     groupedPicture = group(picture, True)
 
@@ -197,7 +195,8 @@ def encMethodSave6(file, picture):
                 # Write one byte for background color value (compressed by color)
                 # Write one byte for foregrounds array size
                 file.writeBytes(
-                    background, len(groupedPicture[alpha][symbol][background])
+                    background,
+                    len(groupedPicture[alpha][symbol][background]),
                 )
 
                 for foreground in groupedPicture[alpha][symbol][background]:
@@ -205,22 +204,30 @@ def encMethodSave6(file, picture):
                     # Write one byte for y array size
                     file.writeBytes(
                         foreground,
-                        len(groupedPicture[alpha][symbol][background][foreground]),
+                        len(
+                            groupedPicture[alpha][symbol][background][
+                                foreground
+                            ],
+                        ),
                     )
 
-                    for y in groupedPicture[alpha][symbol][background][foreground]:
+                    for y in groupedPicture[alpha][symbol][background][
+                        foreground
+                    ]:
                         # Write one byte for current y value
                         # Write one byte for x array size
                         file.writeBytes(
                             y,
                             len(
-                                groupedPicture[alpha][symbol][background][foreground][y]
+                                groupedPicture[alpha][symbol][background][
+                                    foreground
+                                ][y],
                             ),
                         )
 
-                        for x in groupedPicture[alpha][symbol][background][foreground][
-                            y
-                        ]:
+                        for x in groupedPicture[alpha][symbol][background][
+                            foreground
+                        ][y]:
                             file.writeBytes(x)
     return True, None
 
@@ -229,7 +236,7 @@ encodingMethodsSave[6] = encMethodSave6
 
 
 def encMethodLoad6(file, picture, mode=0):
-    "Very efficiant."
+    """Very efficiant."""
     picture[0] = file.readBytes(1)
     picture[1] = file.readBytes(1)
 
@@ -254,7 +261,7 @@ def encMethodLoad6(file, picture, mode=0):
                     ySize = file.readBytes(1)
 
                     for y in range(ySize + mode):
-                        currentY = file.readBytes(1)
+                        currently = file.readBytes(1)
                         xSize = file.readBytes(1)
 
                         for x in range(xSize + mode):
@@ -263,20 +270,20 @@ def encMethodLoad6(file, picture, mode=0):
                             if currentX is None:
                                 print(
                                     currentX,
-                                    currentY,
+                                    currently,
                                     "%06x" % currentBackground,
                                     "%06x" % currentForeground,
                                     currentAlpha,
                                     currentSymbol,
                                 )
                                 print(
-                                    f"{x}/{xSize} {y}/{ySize} {background}/{backgroundSize} {foreground}/{foregroundSize} {alpha}/{alphaSize} {symbol}/{symbolSize}"
+                                    f"{x}/{xSize} {y}/{ySize} {background}/{backgroundSize} {foreground}/{foregroundSize} {alpha}/{alphaSize} {symbol}/{symbolSize}",
                                 )
                                 return None, None
-                            index = getIndex(currentX, currentY, picture[0])
+                            index = getIndex(currentX, currently, picture[0])
                             if index < 2:
                                 ##                                print('Low index!')
-                                ##                                print(currentX, currentY)
+                                ##                                print(currentX, currently)
                                 continue
                             (
                                 picture[index],
@@ -289,7 +296,7 @@ def encMethodLoad6(file, picture, mode=0):
                                 currentAlpha,
                                 currentSymbol,
                             )
-    ##                            set_(picture, currentX, currentY, currentBackground, currentForeground, currentAlpha, currentSymbol)
+    ##                            set_(picture, currentX, currently, currentBackground, currentForeground, currentAlpha, currentSymbol)
     return None, None
 
 
@@ -297,22 +304,22 @@ encodingMethodsLoad[6] = encMethodLoad6
 
 
 def getSize(picture):
-    "Return the size of a given picture."
+    """Return the size of a given picture."""
     return picture[0], picture[1]
 
 
 def getWidth(picture) -> int:
-    "Return the width of a given picture."
+    """Return the width of a given picture."""
     return picture[0]
 
 
 def getHeight(picture) -> int:
-    "Return the height of a given picture."
+    """Return the height of a given picture."""
     return picture[1]
 
 
 def getIndex(x: int, y: int, width: int) -> int:
-    "Return the internal picture index of a given pixel, given xy position and the width of the image. Indexing starts at 1, 1."
+    """Return the internal picture index of a given pixel, given xy position and the width of the image. Indexing starts at 1, 1."""
     # Original
     # return 4 * (width * (y - 1) + x) - 1
     # Fixed python indexing
@@ -323,9 +330,14 @@ def getIndex(x: int, y: int, width: int) -> int:
 
 
 def set_(picture, x, y, background, foreground, alpha, symbol):
-    "Set the data of the pixel at given xy choordinates in a given image."
+    """Set the data of the pixel at given xy choordinates in a given image."""
     index = getIndex(x, y, picture[0])
-    picture[index], picture[index + 1], picture[index + 2], picture[index + 3] = (
+    (
+        picture[index],
+        picture[index + 1],
+        picture[index + 2],
+        picture[index + 3],
+    ) = (
         background,
         foreground,
         alpha,
@@ -336,13 +348,18 @@ def set_(picture, x, y, background, foreground, alpha, symbol):
 
 
 def get(picture, x, y):
-    "Return the background, foreground, alpha, and symol at the pixel at given xy choordinates in given image."
+    """Return the background, foreground, alpha, and symbol at the pixel at given xy choordinates in given image."""
     index = getIndex(x, y, picture[0])
-    return picture[index], picture[index + 1], picture[index + 2], picture[index + 3]
+    return (
+        picture[index],
+        picture[index + 1],
+        picture[index + 2],
+        picture[index + 3],
+    )
 
 
 def _pictLstToDict(lst):
-    "Convert picture from list to dictionary."
+    """Convert picture from list to dictionary."""
     return {i: lst[i] for i in range(len(lst))}
 
 
@@ -355,7 +372,7 @@ def create(
     symbol=" ",
     random_=False,
 ):
-    "Create a new picture with given arguments."
+    """Create a new picture with given arguments."""
     picture = [width, height]
 
     for _ in range(math.ceil(width * height)):
@@ -374,13 +391,13 @@ def create(
 
 
 def copy(picture):
-    "Return a copy of given picture."
+    """Return a copy of given picture."""
     v = [i for i in picture.values()]
     return _pictLstToDict(v)
 
 
 def save(path, picture, encodingMethod=6):
-    "Save a given picture to a file at path, using given encoding method."
+    """Save a given picture to a file at path, using given encoding method."""
     file, reason = filesystem.open(path, "wb")
     if file:
         if encodingMethodsSave[encodingMethod]:
@@ -402,7 +419,7 @@ def save(path, picture, encodingMethod=6):
 
 
 def load(path):
-    "Load an image from given path. Automatically de-compresses."
+    """Load an image from given path. Automatically de-compresses."""
     file, reason = filesystem.open(path, "rb")
     if file:
         print(f"Length: {file.proxy.size(path)[0]}")
@@ -411,7 +428,10 @@ def load(path):
             encodingMethod = file.readBytes(1)
             if encodingMethod in encodingMethodsLoad:
                 picture = {}
-                result, reason = encodingMethodsLoad[encodingMethod](file, picture)
+                result, reason = encodingMethodsLoad[encodingMethod](
+                    file,
+                    picture,
+                )
 
                 print(f"End position: {file.position}")
 
@@ -434,7 +454,7 @@ def load(path):
 
 
 def toString(picture):
-    "Convert an image into a string and return the string."
+    """Convert an image into a string and return the string."""
     charArray = ["%02X" % picture[0], "%02X" % picture[1]]
 
     for i in range(2, len(picture), 4):
@@ -450,7 +470,7 @@ def toString(picture):
 
 
 def fromString(pictureString):
-    "Convert an picture string back into a picture again."
+    """Convert an picture string back into a picture again."""
 
     def hfstr(string):
         return int("0x" + string.lower(), 16)
@@ -467,7 +487,7 @@ def fromString(pictureString):
 
 
 def transform(picture, newWidth: int, newHeight: int):
-    "Scale picture to a new size."
+    """Scale picture to a new size."""
     newPicture = [newWidth, newHeight]
     stepWidth, stepHeight = picture[0] / newWidth, picture[1] / newHeight
 
@@ -487,10 +507,15 @@ def transform(picture, newWidth: int, newHeight: int):
 
 
 def crop(picture, fromX, fromY, width, height):
-    "Return picture cropped to size width, height, starting at fromX, fromY, returns cropped, None on success, False, Error of failure."
+    """Return picture cropped to size width, height, starting at fromX, fromY, returns cropped, None on success, False, Error of failure."""
     # toX, toY = fromX + width - 1, fromY + height - 1
     toX, toY = fromX + width, fromY + height
-    if fromX >= 1 and fromY >= 1 and toX - 1 <= picture[0] and toY - 1 <= picture[1]:
+    if (
+        fromX >= 1
+        and fromY >= 1
+        and toX - 1 <= picture[0]
+        and toY - 1 <= picture[1]
+    ):
         newPicture = [width, height]
 
         for y in range(fromY, toY):
@@ -501,13 +526,16 @@ def crop(picture, fromX, fromY, width, height):
                 newPicture.append(al)
                 newPicture.append(sy)
     else:
-        return False, "Failed to crop image: target coordinates are out of range."
+        return (
+            False,
+            "Failed to crop image: target coordinates are out of range.",
+        )
 
     return _pictLstToDict(newPicture), None
 
 
 def flipHorizontally(picture):
-    "Return the picture mirrored on the X axes."
+    """Return the picture mirrored on the X axes."""
     newPicture = [picture[0], picture[1]]
 
     for y in range(1, picture[1] + 1):
@@ -522,7 +550,7 @@ def flipHorizontally(picture):
 
 
 def flipVertically(picture):
-    "Return the picture mirrored on the X axes."
+    """Return the picture mirrored on the X axes."""
     newPicture = [picture[0], picture[1]]
 
     for y in range(picture[1], 0, -1):
@@ -547,11 +575,18 @@ def expand(
     alpha=0,
     symbol=" ",
 ):
-    "Expand a picture in all four directions, with new pixels defined with background, foreground, alpha, and symbol arguments. No random."
+    """Expand a picture in all four directions, with new pixels defined with background, foreground, alpha, and symbol arguments. No random."""
     newWidth = picture[0] + fromRight + fromLeft
     newHeight = picture[1] + fromTop + fromBottom
     # Create new picture filled with new pixels from arguments
-    newPicture = create(newWidth, newHeight, background, foreground, alpha, symbol)
+    newPicture = create(
+        newWidth,
+        newHeight,
+        background,
+        foreground,
+        alpha,
+        symbol,
+    )
 
     # Copy pixels from original pixel, overwriting new ones.
     for y in range(1, picture[1] + 1):
@@ -562,12 +597,14 @@ def expand(
 
 
 def blend(picture, blendColor, transparency):
-    "Blend the background and forground with blendColor by transparency for every pixel in picture. Usually is, but has to be in 24 bit color mode."
+    """Blend the background and foreground with blendColor by transparency for every pixel in picture. Usually is, but has to be in 24 bit color mode."""
     newPicture = [picture[0], picture[1]]
 
     for i in range(2, len(picture), 4):
         newPicture.append(color.blend(picture[i], blendColor, transparency))
-        newPicture.append(color.blend(picture[i + 1], blendColor, transparency))
+        newPicture.append(
+            color.blend(picture[i + 1], blendColor, transparency),
+        )
         newPicture.append(picture[i + 2])
         newPicture.append(picture[i + 3])
 

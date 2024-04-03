@@ -13,7 +13,7 @@ argex = 'cats="True and Sand" true=\'Cats two\' sand="graval"'
 
 
 def parseargs(string: str):
-    """Split a given string into individual arguments, seperated into key:arg for <key>=(' or ")<arg>(same char as start)"""
+    """Split a given string into individual arguments, separated into key:arg for <key>=(' or ")<arg>(same char as start)"""
     arg = {}
     # ([%-%w]+)=([\"'])(.-)%2
     # '([\w]+)=([\"\'])(.*)'
@@ -59,12 +59,12 @@ def collect(string: str):
             self.empty = empty
 
     while True:
-        ni
-        h
-        c
-        lable
-        xarg
-        emtpy
+        ##ni
+        ##h
+        ##c
+        ##label
+        ##xarg
+        ##empty
         if not ni:
             break
         text = string[i : ni - 1]

@@ -30,8 +30,8 @@ __all__ = [
 
 def mathModf(x: SupportsFloat | SupportsIndex) -> tuple[float, float]:
     """Fix python math.modf ordering for lua code port."""
-    fractional, intiger = modf(x)
-    return intiger, fractional
+    fractional, integer = modf(x)
+    return integer, fractional
 
 
 # fmt: off
@@ -99,7 +99,11 @@ def blend(color1: int, color2: int, transparency: float) -> int:
     invertedTransparency = 1 - transparency
     r = (
         int(
-            ((color2 >> 16) * invertedTransparency + (color1 >> 16) * transparency) // 1
+            (
+                (color2 >> 16) * invertedTransparency
+                + (color1 >> 16) * transparency
+            )
+            // 1,
         )
         << 16
     )
@@ -109,12 +113,16 @@ def blend(color1: int, color2: int, transparency: float) -> int:
                 (color2 >> 8 & 0xFF) * invertedTransparency
                 + (color1 >> 8 & 0xFF) * transparency
             )
-            // 1
+            // 1,
         )
         << 8
     )
     b = int(
-        ((color2 & 0xFF) * invertedTransparency + (color1 & 0xFF) * transparency) // 1
+        (
+            (color2 & 0xFF) * invertedTransparency
+            + (color1 & 0xFF) * transparency
+        )
+        // 1,
     )
     return r | g | b
 
@@ -149,7 +157,9 @@ def to8Bit(color_24_bit: int) -> int:
             palette_color & 0xFF,
         )
 
-        delta = (palette_r - r) ** 2 + (palette_g - g) ** 2 + (palette_b - b) ** 2
+        delta = (
+            (palette_r - r) ** 2 + (palette_g - g) ** 2 + (palette_b - b) ** 2
+        )
         if delta < closestDelta:
             closestDelta, closestIndex = delta, i
     return closestIndex - 1

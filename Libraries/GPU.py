@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# TITLE DISCRIPTION
+# TITLE DESCRIPTION
 # -*- coding: utf-8 -*-
 
 # Programmed by CoolCat467

@@ -20,8 +20,6 @@ import Proxy as _Proxy
 BOOT_PROXY = None
 PRIMARYS = {}
 
-import computer
-
 
 def get(abbreviatedAddress):
     """Returns full address from an abbreviated address."""
@@ -62,10 +60,10 @@ def newRandomAddress():
         lst = []
         for i in range(num):
             lst.append(random.randint(0x0, 0xF))
-        return "".join((hex(i)[2:] for i in lst))
+        return "".join(hex(i)[2:] for i in lst)
 
     # (getRandom(8), getRandom(4), getRandom(4), getRandom(4), getRandom(12))
-    return "-".join((getRandom(i) for i in parts))
+    return "-".join(getRandom(i) for i in parts)
 
 
 def addComponent(name, address):

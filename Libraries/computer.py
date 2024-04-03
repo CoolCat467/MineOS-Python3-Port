@@ -38,8 +38,7 @@ import os
 import struct
 import time
 from collections import deque
-from threading import Lock as _Lock
-from threading import Thread as _Thread
+from threading import Lock as _Lock, Thread as _Thread
 
 _ADDRESS = "a1b2c3d4-e5f6-a1b2-c3d4-e5f6a1b2c3d4"
 _TMPFS = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
@@ -85,7 +84,6 @@ def isRunning():
 
 def crash(reason):
     """Attempts to crash the computer for the specified reason."""
-    pass
 
 
 def getArchitecture():
@@ -135,7 +133,6 @@ def uptime():
 
 def shutdown(reboot=False):
     """Shuts down the computer. Optionally reboots the computer, if reboot is true, i.e. shuts down, then starts it again automatically. This function never returns."""
-    pass
 
 
 def getBootAddress():
@@ -145,7 +142,6 @@ def getBootAddress():
 
 def setBootAddress(address=None):
     """Set the address of the filesystem component from which to try to boot first. Call with nil / no arguments to clear."""
-    pass
 
 
 def runlevel():
@@ -175,7 +171,7 @@ def removeUser(name):
     return False
 
 
-class _Signal(object):
+class _Signal:
     def __init__(self, name, *args):
         self.name = name
         self.args = args
@@ -183,8 +179,6 @@ class _Signal(object):
     def __repr__(self):
         args = " ,".join(self.args)
         return f"_Signal({self.name}, {args})"
-
-    pass
 
 
 def pushSignal(name, *args):
@@ -239,7 +233,8 @@ def beep(frequency, duration):
     def play(filename):
         # f32le = 32 bit float encoding in Little-endian byte order
         os.system(
-            "ffplay -autoexit -showmode 0 -f f32le -ar %f %s" % (_SAMPLERATE, filename)
+            "ffplay -autoexit -showmode 0 -f f32le -ar %f %s"
+            % (_SAMPLERATE, filename),
         )
 
     def _beepSound(beepId):
@@ -257,7 +252,6 @@ def beep(frequency, duration):
             save(output, file)
             play(file)
             os.remove(file)
-        pass
 
     # Get beep lock
     _NEWBEEP.acquire()

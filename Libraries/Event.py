@@ -44,7 +44,7 @@ def checkArg(argument, types):
 
 
 def pairs(table):
-    """Return generater that iterates through the zipped keys and values of a table."""
+    """Return generator that iterates through the zipped keys and values of a table."""
     return ((k, table[k]) for k in table if table[k])
 
 
@@ -52,7 +52,7 @@ def error(name, code=None):
     raise InterruptedError(f"{name} {code}")
 
 
-class Handler(object):
+class Handler:
     def __init__(self, callback, times=inf, interval=0):
         self.callback = callback
         self.times = times  # or mathHuge
@@ -61,8 +61,6 @@ class Handler(object):
 
     def __repr__(self):
         return f"Handler({self.callback}, {self.times}, {self.interval})"
-
-    pass
 
 
 interruptingEnabled = True
@@ -172,7 +170,7 @@ def pull(preferredTimeout=None):
                 return signalData
 
 
-# Sleeps "time" of secconds
+# Sleeps "time" of seconds
 def sleep(time):
     """Sleeps delay seconds via busy-wait concept. This method allows event handlers to be processed if any event occurs during sleeping."""
     checkArg(time, (int, float, None))

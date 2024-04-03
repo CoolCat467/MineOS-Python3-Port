@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# TITLE DISCRIPTION
+# TITLE DESCRIPTION
 # -*- coding: utf-8 -*-
 
 # Programmed by CoolCat467
@@ -31,7 +31,11 @@ def run():
     linemod = len(nocom) % PERLINE
     lines = int((len(nocom) - linemod) / PERLINE) + 1
     for i in range(lines):
-        print(" " * SPACES + ", ".join(nocom[i * PERLINE : (i + 1) * PERLINE]) + ",")
+        print(
+            " " * SPACES
+            + ", ".join(nocom[i * PERLINE : (i + 1) * PERLINE])
+            + ",",
+        )
 
 
 if __name__ == "__main__":

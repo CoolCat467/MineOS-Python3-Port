@@ -271,8 +271,8 @@ def encMethodLoad6(file, picture, mode=0):
                                 print(
                                     currentX,
                                     currently,
-                                    "%06x" % currentBackground,
-                                    "%06x" % currentForeground,
+                                    f"{currentBackground:06x}",
+                                    f"{currentForeground:06x}",
                                     currentAlpha,
                                     currentSymbol,
                                 )
@@ -455,12 +455,12 @@ def load(path):
 
 def toString(picture):
     """Convert an image into a string and return the string."""
-    charArray = ["%02X" % picture[0], "%02X" % picture[1]]
+    charArray = [f"{picture[0]:02X}", f"{picture[1]:02X}"]
 
     for i in range(2, len(picture), 4):
-        charArray.append("%02X" % color.to8Bit(picture[i]))
-        charArray.append("%02X" % color.to8Bit(picture[i + 1]))
-        charArray.append("%02X" % math.floor(picture[i + 2] * 255))
+        charArray.append(f"{color.to8Bit(picture[i]):02X}")
+        charArray.append(f"{color.to8Bit(picture[i + 1]):02X}")
+        charArray.append(f"{math.floor(picture[i + 2] * 255):02X}")
         charArray.append(picture[i + 3])
 
         if i % 603 == 0:

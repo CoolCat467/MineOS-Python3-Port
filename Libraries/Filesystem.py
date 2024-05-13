@@ -118,7 +118,7 @@ def extension(path_):
 
 
 def hideExtension(path_):
-    """Returns given path without it's extension"""
+    """Returns given path without it's extension."""
     spPath = path_.split("/")
     spPath[-1] = spPath[-1].split(".")[0]
     return "/".join(spPath)
@@ -167,6 +167,7 @@ def unmount(proxy):
     error(
         f"Bad argument (filesystem proxy or mounted path expected, got {proxy}).",
     )
+    return None
 
 
 def get(path_):
@@ -331,6 +332,7 @@ class _Handle:
             self.buffer = ""
             return result  # , reason
         error(f"{reason}")
+        return None
 
     def close(self):
         """Closes file stream, flushes internal buffer and releases the handle."""
@@ -375,7 +377,7 @@ class _Handle:
         return data
 
     def readLine(self):
-        """Reads next line from file without \n character. Returns string line or None if EOF has reached."""
+        r"""Reads next line from file without \n character. Returns string line or None if EOF has reached."""
         data = _getForMode("", self.mode)
 
         linebreak = _getForMode("\n", self.mode)
@@ -445,7 +447,10 @@ class _Handle:
                 return ord(data)
             return None
         else:
-            lst = lambda x: [i for i in x]
+
+            def lst(x):
+                return [i for i in x]
+
             bytes_ = lst(string.byte(self.readString(count))[:8]) or b"\x00"
             result = 0
 
@@ -500,6 +505,7 @@ class _Handle:
                     f"Bad argument #2 ('a' (whole file), 'l' (line), 'u' (unicode char), 'b' (byte as number) or 'bs' (sequence of n bytes as number) expected, got {type(_format)})",
                 )
         error(f"Bad argument #1 (int or str expected, got {type(format_)}).")
+        return None
 
     def write(self, *write_):
         """Writes passed arguments to file. Returns True, None on success, False and reason message otherwise. Arguments may have str, int, or bool type."""
@@ -584,6 +590,7 @@ def copy(fromPath, toPath):
             list__ = list_(fromPath)
             for item in list__:
                 copyRecursively(f"{fromPath}/{item}", f"{toPath}/{item}")
+            return None
         else:
             fromHandle = open_(fromPath, "rb")
             if fromHandle:
@@ -617,6 +624,7 @@ def rename(fromPath, toPath):
         copy(fromPath, toPath)
         # Remove original files
         remove(fromPath)
+        return None
 
 
 def read(path_):
@@ -642,6 +650,7 @@ def lines(path_):
     if reason is None:
         return handle.lines()
     error(reason)
+    return None
 
 
 def readLines(path_):
@@ -747,6 +756,7 @@ def doFile(path_, *args, **kwargs):
             return data[1]
         error(data[1])
     error(reason)
+    return None
 
 
 BOOT_PROXY = component.BOOT_PROXY

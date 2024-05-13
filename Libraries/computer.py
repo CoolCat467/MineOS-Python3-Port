@@ -271,5 +271,5 @@ def beep(frequency, duration):
 
 
 def getDeviceInfo():
-    """Returns a table of information about installed devices in the computer."""
+    """Return a table of information about installed devices in the computer."""
     return dict

@@ -18,7 +18,7 @@ Paths API is completely implemented.
 Sides API is completely implemented.
 Filesystem API is implemented, but loadfile is probably broken and numerouse issues have been observed with the handler class, some coming from component.Proxy.
 Filesystem API write is known to function properly, reading may be broken.
-Image API is completely implemented, but I am having diffuculties getting encoding method six to load files, and saving images works for the most part.
+Image API is completely implemented, but I am having difficulties getting encoding method six to load files, and saving images works for the most part.
 I have observed that small images can be saved and loaded successfully, larger ones break. I suspect that the digit bytes for length of packet are being loaded improperly, as it reaches EOF prematurely.
 
 

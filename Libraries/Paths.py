@@ -2,7 +2,7 @@
 # This library provides most commonly used MineOS system and user paths.
 # -*- coding: utf-8 -*-
 
-__all__ = ["system", "user", "getUser", "updateUser", "create"]
+__all__ = ["create", "getUser", "system", "updateUser", "user"]
 
 # System is re-defined below
 system = None

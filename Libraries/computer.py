@@ -68,10 +68,9 @@ def start():
         if _SHUTTINGDOWN:
             _REBOOT = True
         return False
-    else:
-        _RUNNING = True
-        _START = math.floor(time.time())
-        return True
+    _RUNNING = True
+    _START = math.floor(time.time())
+    return True
 
 
 def stop():
@@ -242,17 +241,16 @@ def beep(frequency, duration):
         if isinstance(frequency, str):
             # morris code mode, ignore duration.
             raise NotImplementedError
-        else:
-            if frequency < 20 or frequency > 2000:
-                return
-            hz = frequency
-            step = (hz * 2 * math.pi) / _SAMPLERATE
-            f = square
-            output = [f(i * step) for i in range(int(_SAMPLERATE * duration))]
-            file = f"beep{beepId}.bin"
-            save(output, file)
-            play(file)
-            os.remove(file)
+        if frequency < 20 or frequency > 2000:
+            return
+        hz = frequency
+        step = (hz * 2 * math.pi) / _SAMPLERATE
+        f = square
+        output = [f(i * step) for i in range(int(_SAMPLERATE * duration))]
+        file = f"beep{beepId}.bin"
+        save(output, file)
+        play(file)
+        os.remove(file)
 
     # Get beep lock
     _NEWBEEP.acquire()

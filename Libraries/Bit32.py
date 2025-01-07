@@ -10,11 +10,11 @@ __all__ = [
     "btest",
     "bxor",
     "extract",
-    "replace",
-    "lshift",
-    "rshift",
-    "rrotate",
     "lrotate",
+    "lshift",
+    "replace",
+    "rrotate",
+    "rshift",
 ]
 
 
@@ -114,7 +114,7 @@ def rrotate(x, disp):
     """Rotate x's bits to the right by disp."""
     if disp == 0:
         return x
-    elif disp < 0:
+    if disp < 0:
         return lrotate(x, -disp)
     disp &= 31
     x = trim(x)
@@ -125,7 +125,7 @@ def lrotate(x, disp):
     """Rotate x's bits to the left by disp."""
     if disp == 0:
         return x
-    elif disp < 0:
+    if disp < 0:
         return rrotate(x, -disp)
     disp &= 31
     x = trim(x)

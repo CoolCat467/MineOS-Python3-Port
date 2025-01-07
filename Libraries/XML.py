@@ -2,7 +2,7 @@
 # XML API, for dealing with XML strings
 # -*- coding: utf-8 -*-
 
-__all__ = ["parseargs", "collect"]
+__all__ = ["collect", "parseargs"]
 
 "<users>\n\t<user>\n\t\t<id>1</id>\n\t\t<name>Fred</name>\n\t\t<salary>500000</salary>\n\t</user>\n\t<user>\n\t\t<id>1</id>\n\t\t<name>ScienceCat</name>\n\t\t<salary>500000</salary>\n\t</user>\n\t<user>\n\t\t<id>1</id>\n\t\t<name>Bob</name>\n\t\t<salary>500000</salary>\n\t</user>\n</users>"
 xmlex = "<users>\n<user>\n<id>1</id>\n<name>Fred</name>\n<salary>500000</salary>\n</user>\n<user>\n<id>1</id>\n<name>ScienceCat</name>\n<salary>500000</salary>\n</user>\n<user>\n<id>1</id>\n<name>Bob</name>\n<salary>500000</salary>\n</user>\n</users>"

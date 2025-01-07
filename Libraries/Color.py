@@ -15,17 +15,17 @@ from typing import SupportsFloat
 from typing_extensions import SupportsIndex
 
 __all__ = [
-    "RGBToInteger",
-    "integerToRGB",
-    "RGBToHSB",
-    "HSBToRGB",
-    "integerToHSB",
     "HSBToInteger",
+    "HSBToRGB",
+    "RGBToHSB",
+    "RGBToInteger",
     "blend",
-    "transition",
+    "integerToHSB",
+    "integerToRGB",
+    "optimize",
     "to8Bit",
     "to24Bit",
-    "optimize",
+    "transition",
 ]
 
 
@@ -176,32 +176,32 @@ def RGBToHSB(r: int, g: int, b: int) -> tuple[float, float, float]:
     maxv, minv = max(r, g, b), min(r, g, b)
 
     if maxv == minv:
-        return 0, maxv == 0 and 0 or (1 - minv / maxv), maxv / 255
-    elif maxv == r and g >= b:
+        return 0, (maxv == 0 and 0) or (1 - minv / maxv), maxv / 255
+    if maxv == r and g >= b:
         return (
             60 * (g - b) / (maxv - minv),
-            maxv == 0 and 0 or (1 - minv / maxv),
+            (maxv == 0 and 0) or (1 - minv / maxv),
             maxv / 255,
         )
-    elif maxv == r and g < b:
+    if maxv == r and g < b:
         return (
             60 * (g - b) / (maxv - minv) + 360,
-            maxv == 0 and 0 or (1 - minv / maxv),
+            (maxv == 0 and 0) or (1 - minv / maxv),
             maxv / 255,
         )
-    elif maxv == g:
+    if maxv == g:
         return (
             60 * (b - r) / (maxv - minv) + 120,
-            maxv == 0 and 0 or (1 - minv / maxv),
+            (maxv == 0 and 0) or (1 - minv / maxv),
             maxv / 255,
         )
-    elif maxv == b:
+    if maxv == b:
         return (
             60 * (r - g) / (maxv - minv) + 240,
-            maxv == 0 and 0 or (1 - minv / maxv),
+            (maxv == 0 and 0) or (1 - minv / maxv),
             maxv / 255,
         )
-    return 0, maxv == 0 and 0 or (1 - minv / maxv), maxv / 255
+    return 0, (maxv == 0 and 0) or (1 - minv / maxv), maxv / 255
 
 
 def HSBToRGB(h: float, s: float, b: float) -> tuple[int, int, int]:
@@ -213,13 +213,13 @@ def HSBToRGB(h: float, s: float, b: float) -> tuple[int, int, int]:
 
     if integer == 0:
         return floor(b * 255), floor(t * 255), floor(p * 255)
-    elif integer == 1:
+    if integer == 1:
         return floor(q * 255), floor(b * 255), floor(p * 255)
-    elif integer == 2:
+    if integer == 2:
         return floor(p * 255), floor(b * 255), floor(t * 255)
-    elif integer == 3:
+    if integer == 3:
         return floor(p * 255), floor(q * 255), floor(b * 255)
-    elif integer == 4:
+    if integer == 4:
         return floor(t * 255), floor(p * 255), floor(b * 255)
     return floor(b * 255), floor(p * 255), floor(q * 255)
 

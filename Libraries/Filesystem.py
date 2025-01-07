@@ -61,7 +61,7 @@ class string:
             return ord(bytes_)
         if isinstance(bytes_, bytes):
             return bytes_.decode("utf-8")
-        elif isinstance(bytes_, str):
+        if isinstance(bytes_, str):
             return bytes_
         print(bytes_)
         raise ValueError
@@ -71,9 +71,9 @@ class string:
         """Encode string and return bytes."""
         if isinstance(string_, str):
             return string_.encode("utf-8")
-        elif isinstance(string_, int):
+        if isinstance(string_, int):
             return chr(string_)
-        elif isinstance(string_, bytes):
+        if isinstance(string_, bytes):
             return string_
         raise ValueError
 
@@ -142,7 +142,7 @@ def mount(proxy, path_):
                 False,
                 "Mount path has been taken by another mounted filesystem.",
             )
-        elif mp.proxy == proxy:
+        if mp.proxy == proxy:
             return False, "Proxy is already mounted."
 
     mountedProxies.append(_mountProxy(path_, proxy))
@@ -157,7 +157,7 @@ def unmount(proxy):
                 del mountedProxies[i]
                 return True, None
         return False, "Specified proxy is not mounted."
-    elif isinstance(proxy, str):
+    if isinstance(proxy, str):
         for i in range(len(mountedProxies)):
             if mountedProxies[i].address == proxy:
                 del mountedProxies[i]
@@ -239,12 +239,12 @@ def list_(path_, sortingMethod=SORTING_NAME):
         if sortingMethod == SORTING_NAME:
             list__.sort(lambda a, b: a.lower() < b.lower())
             return list__, None
-        elif sortingMethod == SORTING_DATE:
+        if sortingMethod == SORTING_DATE:
             list__.sort(
                 lambda a, b: lastModified(path_ + a) > lastModified(path_ + b),
             )
             return list__, None
-        elif sortingMethod == SORTING_TYPE:
+        if sortingMethod == SORTING_TYPE:
             # Create a map with "extension" structure
             map_ = {}
             for file in list__:
@@ -391,8 +391,7 @@ class _Handle:
 
                     ##                    return data + chunk
                     return string.char(data + chunk)
-                else:
-                    data += self.buffer
+                data += self.buffer
 
             chunk, error_ = self.proxy.read(self.stream, BUFFER_SIZE)
             if error_:
@@ -405,7 +404,7 @@ class _Handle:
                 self.position = self.seek("end", 0)
 
                 ##                return len(data) > 0 and data or None
-                return len(data) > 0 and string.char(data) or None
+                return (len(data) > 0 and string.char(data)) or None
 
     def lines(self):
         """Return a generator object that will return lines, and on EOF close self."""
@@ -446,21 +445,20 @@ class _Handle:
             if data:
                 return ord(data)
             return None
+
+        def lst(x):
+            return [i for i in x]
+
+        bytes_ = lst(string.byte(self.readString(count))[:8]) or b"\x00"
+        result = 0
+
+        if littleEndian:
+            for i in range(len(bytes_) - 1, -1, -1):
+                result = bit32.bor(bit32.lshift(result, 8), bytes_[i])
         else:
-
-            def lst(x):
-                return [i for i in x]
-
-            bytes_ = lst(string.byte(self.readString(count))[:8]) or b"\x00"
-            result = 0
-
-            if littleEndian:
-                for i in range(len(bytes_) - 1, -1, -1):
-                    result = bit32.bor(bit32.lshift(result, 8), bytes_[i])
-            else:
-                for i in range(len(bytes_)):
-                    result = bit32.bor(bit32.lshift(result, 8), bytes_[i])
-            return result
+            for i in range(len(bytes_)):
+                result = bit32.bor(bit32.lshift(result, 8), bytes_[i])
+        return result
 
     def readUnicodeChar(self):
         """Reads next bytes (up to 6 from current position) as char in UTF-8 encoding. Returns string value or nil if EOF has reached."""
@@ -487,23 +485,22 @@ class _Handle:
         """Read from this handle in a given format."""
         if isinstance(format_, int):
             return self.readString(format_)
-        elif isinstance(format_, str):
+        if isinstance(format_, str):
             format_ = format_.replace("^%*", "").lower()
 
             if format_ == "a":
                 return self.readAll()
-            elif format_ == "l":
+            if format_ == "l":
                 return self.readLine()
-            elif format_ == "b":
+            if format_ == "b":
                 return self.readBytes(1)
-            elif format_ == "bs":
+            if format_ == "bs":
                 return self.readBytes(bytesSize)
-            elif format_ == "u":
+            if format_ == "u":
                 return self.readUnicodeChar()
-            else:
-                error(
-                    f"Bad argument #2 ('a' (whole file), 'l' (line), 'u' (unicode char), 'b' (byte as number) or 'bs' (sequence of n bytes as number) expected, got {type(_format)})",
-                )
+            error(
+                f"Bad argument #2 ('a' (whole file), 'l' (line), 'u' (unicode char), 'b' (byte as number) or 'bs' (sequence of n bytes as number) expected, got {type(_format)})",
+            )
         error(f"Bad argument #1 (int or str expected, got {type(format_)}).")
         return None
 
@@ -591,22 +588,21 @@ def copy(fromPath, toPath):
             for item in list__:
                 copyRecursively(f"{fromPath}/{item}", f"{toPath}/{item}")
             return None
-        else:
-            fromHandle = open_(fromPath, "rb")
-            if fromHandle:
-                toHandle = open_(toPath, "wb")
-                if toHandle:
-                    while True:
-                        chunk = fromHandle.readString(BUFFER_SIZE)
-                        if chunk:
-                            if not toHandle.write(chunk):
-                                return False, "Cannot write chunk."
-                        else:
-                            toHandle.close()
-                            fromHandle.close()
-                            break
-                return False, f'Cannot acquire handle for path "{toPath}"'
-            return False, f'Cannot acquire handle for path "{fromHandle}"'
+        fromHandle = open_(fromPath, "rb")
+        if fromHandle:
+            toHandle = open_(toPath, "wb")
+            if toHandle:
+                while True:
+                    chunk = fromHandle.readString(BUFFER_SIZE)
+                    if chunk:
+                        if not toHandle.write(chunk):
+                            return False, "Cannot write chunk."
+                    else:
+                        toHandle.close()
+                        fromHandle.close()
+                        break
+            return False, f'Cannot acquire handle for path "{toPath}"'
+        return False, f'Cannot acquire handle for path "{fromHandle}"'
 
     return copyRecursively(fromPath, toPath)
 
@@ -619,12 +615,11 @@ def rename(fromPath, toPath):
     # If it's the same filesystem component
     if fromProxy.address == toProxy.address:
         return fromProxy.rename(fromProxyPath, toProxyPath)
-    else:
-        # Copy files to destination
-        copy(fromPath, toPath)
-        # Remove original files
-        remove(fromPath)
-        return None
+    # Copy files to destination
+    copy(fromPath, toPath)
+    # Remove original files
+    remove(fromPath)
+    return None
 
 
 def read(path_):

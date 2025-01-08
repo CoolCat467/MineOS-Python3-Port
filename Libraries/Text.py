@@ -11,7 +11,7 @@ def serialize(
     indentator="  ",
     recursionStackLimit=inf,
 ):
-    equalsSymbol = prettyLook and " = " or "="
+    equalsSymbol = (prettyLook and " = ") or "="
 
     def serialize_(t, currentIndentationSymbol, currentRecursionStack):
         result = ""
@@ -96,8 +96,7 @@ def unicodeFind(string, pattern, init, plain):
         b = a + len(bp)
 
         return a, b
-    else:
-        return a, None
+    return a, None
 
 
 def limit(string, limit, mode=None, noDots=False):
@@ -105,12 +104,11 @@ def limit(string, limit, mode=None, noDots=False):
 
     if length <= limit:
         return string
-    elif mode == "left":
+    if mode == "left":
         if noDots:
             return string[length - limit :]
-        else:
-            return "…" + string[length - limit + 1 :]
-    elif mode == "center":
+        return "…" + string[length - limit + 1 :]
+    if mode == "center":
         # Python's modf has the numbers flipped
         fractional, integer = modf(limit / 2)
         integer = int(integer)
@@ -119,8 +117,7 @@ def limit(string, limit, mode=None, noDots=False):
         return string[:integer] + "…" + string[-integer:]
     if noDots:
         return string[:limit]
-    else:
-        return string[: limit - 1] + "…"
+    return string[: limit - 1] + "…"
 
 
 def wrap(data, limit):
@@ -158,8 +155,7 @@ def wrap(data, limit):
                 ##                else:
                 ##                    wrappedLines[i+1] += wrappedLines[i][len(result):]
                 break
-            else:
-                result = preResult + " "
+            result = preResult + " "
 
         wrappedLines[i] = result  # .replace('$', '').replace('', '')
 

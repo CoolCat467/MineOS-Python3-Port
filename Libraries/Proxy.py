@@ -6,20 +6,21 @@
 from __future__ import annotations
 
 __all__ = [
-    "WARNING",
+    "COMPONENTS",
     "LIBRARIES",
     "MINEOS",
     "OPENCOMPUTERS",
-    "COMPONENTS",
+    "WARNING",
     "Proxy",
 ]
 
 WARNING = True
 
 import os as _os
+from collections.abc import Sequence
 from io import IOBase as _IOBASE
 from math import ceil as _ceil
-from typing import Any, Sequence
+from typing import Any
 
 LIBRARIES = _os.path.split(__file__)[0]
 MINEOS = _os.path.split(LIBRARIES)[0]

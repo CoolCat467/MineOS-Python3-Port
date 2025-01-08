@@ -12,17 +12,17 @@ from functools import cache, lru_cache
 from math import floor, inf, modf
 
 __all__ = [
-    "rgb_to_integer",
-    "integer_to_rgb",
-    "rgb_to_hsb",
+    "blend",
+    "hsb_to_integer",
     "hsb_to_rgb",
     "integer_to_hsb",
-    "hsb_to_integer",
-    "blend",
-    "transition",
+    "integer_to_rgb",
+    "optimize",
+    "rgb_to_hsb",
+    "rgb_to_integer",
     "to_8_bit",
     "to_24_bit",
-    "optimize",
+    "transition",
 ]
 
 
@@ -153,32 +153,32 @@ def rgb_to_hsb(r: int, g: int, b: int) -> tuple[float, float, float]:
     maxv, minv = max(r, g, b), min(r, g, b)
 
     if maxv == minv:
-        return 0, maxv == 0 and 0 or (1 - minv / maxv), maxv / 255
+        return 0, (maxv == 0 and 0) or (1 - minv / maxv), maxv / 255
     if maxv == r and g >= b:
         return (
             60 * (g - b) / (maxv - minv),
-            maxv == 0 and 0 or (1 - minv / maxv),
+            (maxv == 0 and 0) or (1 - minv / maxv),
             maxv / 255,
         )
     if maxv == r and g < b:
         return (
             60 * (g - b) / (maxv - minv) + 360,
-            maxv == 0 and 0 or (1 - minv / maxv),
+            (maxv == 0 and 0) or (1 - minv / maxv),
             maxv / 255,
         )
     if maxv == g:
         return (
             60 * (b - r) / (maxv - minv) + 120,
-            maxv == 0 and 0 or (1 - minv / maxv),
+            (maxv == 0 and 0) or (1 - minv / maxv),
             maxv / 255,
         )
     if maxv == b:
         return (
             60 * (r - g) / (maxv - minv) + 240,
-            maxv == 0 and 0 or (1 - minv / maxv),
+            (maxv == 0 and 0) or (1 - minv / maxv),
             maxv / 255,
         )
-    return 0, maxv == 0 and 0 or (1 - minv / maxv), maxv / 255
+    return 0, (maxv == 0 and 0) or (1 - minv / maxv), maxv / 255
 
 
 def hsb_to_rgb(h: float, s: float, b: float) -> tuple[int, int, int]:

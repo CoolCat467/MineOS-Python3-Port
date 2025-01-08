@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Generator
+
 # Programmed by CoolCat467
-from typing import TYPE_CHECKING, Final, Generator
+from typing import TYPE_CHECKING, Final
 
 import color
 import numpy as np
@@ -21,12 +23,12 @@ class Picture:
     """Picture."""
 
     __slots__ = (
-        "width",
+        "alpha",
+        "background",
+        "foreground",
         "height",
         "symbol",
-        "foreground",
-        "background",
-        "alpha",
+        "width",
     )
 
     def __init__(

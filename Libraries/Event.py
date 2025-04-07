@@ -140,10 +140,8 @@ def pull(preferredTimeout=None):
                 handlers[handler] = None
 
         # Program interruption support. It's faster to do it here instead of registering handlers
-        if (
-            signalData[0] == "key_down"
-            or (signalData[0] == "key_up"
-            and interruptingEnabled)
+        if signalData[0] == "key_down" or (
+            signalData[0] == "key_up" and interruptingEnabled
         ):
             # Analysing for which interrupting key is pressed - we don't need keyboard API for this
             if signalData[3] in interruptingKeyCodes:
